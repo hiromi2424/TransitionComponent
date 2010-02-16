@@ -182,7 +182,7 @@ class TransitionComponent extends Object{
 				return false;
 			}
 		}
-		if($models !== null){
+		if($nextStep !== null){
 			if(!$this->checkData($nextStep,$models,$validationMethod,$messages['invalid'])){
 				return false;
 			}
@@ -252,9 +252,8 @@ class TransitionComponent extends Object{
 			
 			$result = true;
 			foreach($models as $model){
-					if( !$this->validateModel($model) ){
-						$result = false;
-					}
+				if( !$this->validateModel($model) ){
+					$result = false;
 				}
 			}
 			if($result){
@@ -470,7 +469,7 @@ class TransitionComponent extends Object{
  * @access public
  */
 	function clearData(){
-		if($this->Session->check('Transition'){
+		if($this->Session->check('Transition')){
 			return $this->Session->delete('Transition');
 		}
 		return true;
