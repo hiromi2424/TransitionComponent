@@ -215,7 +215,9 @@ class TransitionComponent extends Object{
 			$message = $this->messages['prev'];
 		}
 		if(!$this->Session->check($this->sessionKey($prev))){
-			$this->Session->setFlash($message);
+			if($message !== false){
+				$this->Session->setFlash($message);
+			}
 			if($this->autoRedirect){
 				$this->_controller->redirect($prevAction);
 			}
@@ -262,7 +264,9 @@ class TransitionComponent extends Object{
 					$c->redirect($nextStep);
 				}
 			}else{
-				$this->Session->setFlash($message);
+				if($message !== false){
+					$this->Session->setFlash($message);
+				}
 				return false;
 			}
 		}elseif($this->autoComplete && $this->Session->check($sessionKey)){
