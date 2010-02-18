@@ -328,11 +328,16 @@ class TransitionComponent extends Object{
 		
 		// User method.
 		if($validationMethod !== null){
-			$method = $validationMethod;
-			if(is_string($method)){
-				return $model->$method($data);
-			}elseif(is_array($method)){
-				return call_user_func($method,&$model,$data);
+			$isModelMethod = 
+				is_array($validationMethod) &&
+				is_object(current($validationMethod)) &&
+				is_a(current($validationMethod),'Model')
+			;
+			
+			if($isModelMethod){
+				return call_user_func($validationMethod,$data);
+			}else{
+				return call_user_func($validationMethod,&$model,$data);
 			}
 		}
 		
