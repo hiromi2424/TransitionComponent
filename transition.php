@@ -368,9 +368,7 @@ class TransitionComponent extends Object{
 				return $this->models;
 			}
 			$c =& $this->_controller;
-			if($c->uses !== false && is_array($c->uses) ){
-				$models = $c->uses;
-			}elseif($c->modelClass !== null){
+			if($c->modelClass !== null && $c->{$c->modelClass}){
 				$models = $c->modelClass;
 			}
 		}
