@@ -240,9 +240,6 @@ class TransitionComponent extends Object{
 	function checkData($nextStep = null,$models = null,$validationMethod = null,$message = null,$sessionKey = null){
 		$models = $this->_autoLoadModels($models);
 		$c =& $this->_controller;
-		if($models === null){
-			return false;
-		}
 		if($sessionKey === null){
 			$sessionKey = $this->action;
 		}
@@ -252,6 +249,10 @@ class TransitionComponent extends Object{
 		}
 		if(!empty($c->data)){
 			$this->setData($sessionKey,$c->data);
+			
+			if($models === null){
+				return false;
+			}
 			
 			$result = true;
 			foreach($models as $model){
