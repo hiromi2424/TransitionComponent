@@ -227,7 +227,7 @@ class TransitionComponent extends Object{
 	}
 
 /**
- * Check data of current controller with auto validation , auto redirection , auto setFlash ,  and auto storing data
+ * Check data of current controller with auto validation , auto redirection , auto setFlash() ,  and auto restoring data
  *
  * @param mixed $nextStep Next step url (will be given Controller::redirect())
  * @param mixed $models Models for validation
@@ -246,11 +246,14 @@ class TransitionComponent extends Object{
 		if($sessionKey === null){
 			$sessionKey = $this->action;
 		}
+		
+		$sessionKey = $this->sessionKey($sessionKey);
+		
 		if($message === null){
 			$message = $this->messages['invalid'];
 		}
 		if(!empty($c->data)){
-			$this->Session->write($this->sessionKey($sessionKey),$c->data);
+			$this->Session->write($sessionKey,$c->data);
 			
 			$result = true;
 			foreach($models as $model){
