@@ -247,13 +247,11 @@ class TransitionComponent extends Object{
 			$sessionKey = $this->action;
 		}
 		
-		$sessionKey = $this->sessionKey($sessionKey);
-		
 		if($message === null){
 			$message = $this->messages['invalid'];
 		}
 		if(!empty($c->data)){
-			$this->Session->write($sessionKey,$c->data);
+			$this->setData($sessionKey,$c->data);
 			
 			$result = true;
 			foreach($models as $model){
@@ -272,8 +270,8 @@ class TransitionComponent extends Object{
 				}
 				return false;
 			}
-		}elseif($this->autoComplete && $this->Session->check($sessionKey)){
-			$c->data = $this->Session->read($sessionKey);
+		}elseif($this->autoComplete && $this->Session->check($this->sessionKey($sessionKey))){
+			$c->data = $this->data($sessionKey);
 		}
 		
 		return true;
