@@ -251,13 +251,13 @@ class TransitionComponent extends Object{
 			$this->setData($sessionKey,$c->data);
 			
 			if($models === null){
-				return false;
-			}
-			
-			$result = true;
-			foreach($models as $model){
-				if( !$this->validateModel($model) ){
-					$result = false;
+				$result = $this->validateModel(null);
+			}else{
+				$result = true;
+				foreach($models as $model){
+					if( !$this->validateModel($model) ){
+						$result = false;
+					}
 				}
 			}
 			if($result){
@@ -287,19 +287,16 @@ class TransitionComponent extends Object{
  * @access public
  */
 	function validateModel($model,$validationMethod = null){
-		if($model === null){
-			return true;
-		}
 		if($validationMethod === null){
 			$validationMethod = $this->validationMethod;
 		}
 		
 		$c =& $this->_controller;
 		
-		/*
+		/**
 		 * Loading Model object.
 		 */
-		if(!is_object($model)){
+		if(!is_object($model) && $model !== null){
 			$controllerModel = $c->modelClass;
 			$modelName = Inflector::classify($model);
 			
@@ -340,7 +337,7 @@ class TransitionComponent extends Object{
 				is_a(current($validationMethod),'Model')
 			;
 			
-			if($isModelMethod){
+			if($isModelMethod || $model === null){
 				return call_user_func($validationMethod,$data);
 			}else{
 				return call_user_func($validationMethod,&$model,$data);
@@ -367,7 +364,14 @@ class TransitionComponent extends Object{
 		
 		return $result;
 	}
-	
+
+/**
+ * Loading Default/UserSetting Model names.
+ *
+ * @param string $key Key name
+ * @return mixed Session data or null
+ * @access protected
+ */
 	function _autoLoadModels($models){
 		if($models === null){
 			if(!empty($this->models)){
@@ -377,6 +381,8 @@ class TransitionComponent extends Object{
 			if($c->modelClass !== null && $c->{$c->modelClass}){
 				$models = $c->modelClass;
 			}
+		}elseif($model === false){
+			$models = null;
 		}
 		
 		if($models !== null && !is_array($models)){
@@ -401,7 +407,7 @@ class TransitionComponent extends Object{
 	}
 
 /**
- * Get all of session data from key.
+ * Get all of session data.
  *
  * @return mixed Session data or null
  * @access public
@@ -411,7 +417,7 @@ class TransitionComponent extends Object{
 	}
 
 /**
- * Get merged session data from key.
+ * Get merged session data.
  *
  * @return mixed Merged session data or null
  * @access public
