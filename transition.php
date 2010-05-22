@@ -48,7 +48,7 @@ class TransitionComponent extends Object{
  *     ),
  *   )
  * );
- * 
+ *
  * @var mixed array or false
  * @access public
  */
@@ -63,6 +63,17 @@ class TransitionComponent extends Object{
  * @access public
  */
 	var $messages = array();
+
+/**
+ * Parametors set with Session::setFlash().
+ * "element" key Element to wrap flash message in.
+ * "params"  key , Parameters to be sent to layout as view variables.
+ * "key"     key , Message key, default is 'flash'.
+ *
+ * @var array default messages with key
+ * @access public
+ */
+    var $flashParams = array();
 
 /**
  * Turns on or off auto loading session data to Controller::data.
@@ -125,6 +136,11 @@ class TransitionComponent extends Object{
 			'invalid' => __('Input Data was not able to pass varidation. Please, try again.', true),
 			'prev'    => __('Session timed out.', true)
 		);
+		$this->flashParams = array(
+			'element' => 'default',
+			'params' => array(),
+			'key' => 'flash'
+		);
 		// configure.
 		$this->_set($settings);
 		$this->_controller =& $controller;
@@ -140,11 +156,11 @@ class TransitionComponent extends Object{
  */
 	function startup(&$controller){
 		if($this->automation !== false){
-			$doAutomate = 
+			$doAutomate =
 				is_array($this->automation) &&
 				array_key_exists($this->action,$this->automation)
 			;
-				
+
 			if($doAutomate){
 				$automation = $this->automation[$this->action];
 				$defaults = array(
@@ -176,7 +192,7 @@ class TransitionComponent extends Object{
 	function automate($nextStep,$models = null,$prev = null,$validationMethod = null,$messages = array()){
 		$c =& $this->_controller;
 		$messages = array_merge($this->messages,$messages);
-		
+
 		if($prev !== null){
 			if(!$this->checkPrev($prev,$messages['prev'])){
 				return false;
@@ -216,7 +232,7 @@ class TransitionComponent extends Object{
 		}
 		if(!$this->Session->check($this->sessionKey($prev))){
 			if($message !== false){
-				$this->Session->setFlash($message);
+				$this->Session->setFlash($message, $this->flashParams['element'], $this->flashParams['params'], $this->flashParams['key']);
 			}
 			if($this->autoRedirect){
 				$this->_controller->redirect($prevAction);
@@ -243,13 +259,13 @@ class TransitionComponent extends Object{
 		if($sessionKey === null){
 			$sessionKey = $this->action;
 		}
-		
+
 		if($message === null){
 			$message = $this->messages['invalid'];
 		}
 		if(!empty($c->data)){
 			$this->setData($sessionKey,$c->data);
-			
+
 			if($models === null){
 				$result = $this->validateModel(null);
 			}else{
@@ -267,14 +283,14 @@ class TransitionComponent extends Object{
 				}
 			}else{
 				if($message !== false){
-					$this->Session->setFlash($message);
+					$this->Session->setFlash($message, $this->flashParams['element'], $this->flashParams['params'], $this->flashParams['key']);
 				}
 				return false;
 			}
 		}elseif($this->autoComplete && $this->Session->check($this->sessionKey($sessionKey))){
 			$c->data = $this->data($sessionKey);
 		}
-		
+
 		return true;
 	}
 
@@ -290,17 +306,17 @@ class TransitionComponent extends Object{
 		if($validationMethod === null){
 			$validationMethod = $this->validationMethod;
 		}
-		
+
 		$c =& $this->_controller;
-		
+
 		/**
 		 * Loading Model object.
 		 */
 		if(!is_object($model) && $model !== null){
 			$controllerModel = $c->modelClass;
 			$modelName = Inflector::classify($model);
-			
-			$controllerHasModel = 
+
+			$controllerHasModel =
 				property_exists($c,$modelName) ||
 				property_exists($c->{$controllerModel},$modelName)
 			;
@@ -326,29 +342,29 @@ class TransitionComponent extends Object{
 				}
 			}
 		}
-		
+
 		$data = $c->data;
-		
+
 		// User method.
 		if($validationMethod !== null){
-			$isModelMethod = 
+			$isModelMethod =
 				is_array($validationMethod) &&
 				is_object(current($validationMethod)) &&
 				is_a(current($validationMethod),'Model')
 			;
-			
+
 			if($isModelMethod || $model === null){
 				return call_user_func($validationMethod,$data);
 			}else{
 				return call_user_func($validationMethod,&$model,$data);
 			}
 		}
-		
-		
+
+
 		// $model->create();
 		// $this->_controller->debug($c->data);
 		$result = true;
-		
+
 		if(!empty($data)){
 			$model->set($data);
 			if(!$model->validates()){
@@ -361,7 +377,7 @@ class TransitionComponent extends Object{
 			// debugging in development
 			// $c->debug($model->validationErrors);
 		}
-		
+
 		return $result;
 	}
 
@@ -384,7 +400,7 @@ class TransitionComponent extends Object{
 		}elseif($model === false){
 			$models = null;
 		}
-		
+
 		if($models !== null && !is_array($models)){
 			$models = array($models);
 		}
@@ -427,12 +443,12 @@ class TransitionComponent extends Object{
 		if(empty($allData)){
 			return $allData;
 		}
-		
+
 		$merged = array();
 		foreach($allData as $action => $data){
 			$merged = array_merge_recursive($merged , $data);
 		}
-		
+
 		return $merged;
 	}
 
@@ -489,6 +505,6 @@ class TransitionComponent extends Object{
 		}
 		return true;
 	}
-	
+
 }
 
