@@ -4,10 +4,10 @@
  *
  * PHP versions 4 and 5 , CakePHP => 1.2
  *
- * @copyright     Copyright 2010, hiromi
- * @package       cake
- * @subpackage    cake.app.controllers.components.transition
- * @license       Free
+ * @copyright	  Copyright 2010, hiromi
+ * @package		  cake
+ * @subpackage	  cake.app.controllers.components.transition
+ * @license		  Free
  */
 
 
@@ -16,11 +16,11 @@
  * Among form pages , auto validation and auto redirect.
  * This will use Session.
  *
- * @package       cake
- * @subpackage    cake.app.controllers.components.transition
+ * @package		  cake
+ * @subpackage	  cake.app.controllers.components.transition
  */
 
-class TransitionComponent extends Object{
+class TransitionComponent extends Object {
 
 /**
  * Components to use.
@@ -35,18 +35,18 @@ class TransitionComponent extends Object{
  * When Array given, This automate within these key as actions.
  *
  * Example.
- * // beforeFilter  in controller
+ * // beforeFilter	in controller
  * $this->Transition->automation = array(
- *   'action' => array(
- *     'nextStep'          => 'nextAction',
- *     'models'            => array('Model1','Model2'),
- *     'prev'              => 'prevAction',
- *     'validationMethod'  => array(&$this->Model3,'behaviorMethod'),
- *     'messages'          => array(
- *       'invalid' => __('your input was wrong.',true),
- *       'prev'    => __('wrong transition.',true),
- *     ),
- *   )
+ *	 'action' => array(
+ *	   'nextStep'		   => 'nextAction',
+ *	   'models'			   => array('Model1', 'Model2'),
+ *	   'prev'			   => 'prevAction',
+ *	   'validationMethod'  => array(&$this->Model3, 'behaviorMethod'),
+ *	   'messages'		   => array(
+ *		 'invalid' => __('your input was wrong.', true),
+ *		 'prev'	   => __('wrong transition.', true),
+ *	   ),
+ *	 )
  * );
  *
  * @var mixed array or false
@@ -57,7 +57,7 @@ class TransitionComponent extends Object{
 /**
  * Messages set with Session::setFlash().
  * "invalid" key , When it cannot pass validation.
- * "prev"    key , When session has no data for previous action.
+ * "prev"	 key , When session has no data for previous action.
  *
  * @var array default messages with key
  * @access public
@@ -67,13 +67,13 @@ class TransitionComponent extends Object{
 /**
  * Parametors set with Session::setFlash().
  * "element" key Element to wrap flash message in.
- * "params"  key , Parameters to be sent to layout as view variables.
- * "key"     key , Message key, default is 'flash'.
+ * "params"	 key , Parameters to be sent to layout as view variables.
+ * "key"	 key , Message key, default is 'flash'.
  *
  * @var array default messages with key
  * @access public
  */
-    var $flashParams = array();
+	var $flashParams = array();
 
 /**
  * Turns on or off auto loading session data to Controller::data.
@@ -81,7 +81,7 @@ class TransitionComponent extends Object{
  * @var boolean auto loading data
  * @access public
  */
-	var $autoComplete   = true;
+	var $autoComplete = true;
 
 /**
  * Turns on or off auto redirect when data passes validation or session data of previous action is empty.
@@ -89,7 +89,7 @@ class TransitionComponent extends Object{
  * @var boolean auto redirection
  * @access public
  */
-	var $autoRedirect   = true;
+	var $autoRedirect = true;
 
 /**
  * Default models.
@@ -97,7 +97,7 @@ class TransitionComponent extends Object{
  * @var array models
  * @access public
  */
-	var $models         = null;
+	var $models = null;
 
 /**
  * Default validation method.
@@ -121,6 +121,14 @@ class TransitionComponent extends Object{
  * @access private
  */
 	var $action;
+/**
+ * Base of session key
+ *
+ * @var string session base name
+ * @access public
+ */
+	var $sessionBaseKey = 'Transition';
+
 
 /**
  * Initialize the TransitionComponent
@@ -130,11 +138,16 @@ class TransitionComponent extends Object{
  * @return void
  * @access public
  */
-	function initialize(&$controller,$settings = array()){
+	function initialize(&$controller,$settings = array()) {
 		// set default
 		$this->messages = array(
 			'invalid' => __('Input Data was not able to pass varidation. Please, try again.', true),
-			'prev'    => __('Session timed out.', true)
+			'prev'	  => __('Session timed out.', true),
+		);
+		$this->flashParams = array(
+			'element' => 'default',
+			'params' => array(),
+			'key' => 'flash',
 		);
 		$this->flashParams = array(
 			'element' => 'default',
@@ -154,25 +167,25 @@ class TransitionComponent extends Object{
  * @return void
  * @access public
  */
-	function startup(&$controller){
-		if($this->automation !== false){
+	function startup(&$controller) {
+		if ($this->automation !== false) {
 			$doAutomate =
 				is_array($this->automation) &&
-				array_key_exists($this->action,$this->automation)
+				array_key_exists($this->action, $this->automation)
 			;
 
-			if($doAutomate){
+			if ($doAutomate) {
 				$automation = $this->automation[$this->action];
 				$defaults = array(
-					'nextStep'         => null,
-					'models'           => $this->models,
-					'prev'             => null,
+					'nextStep'		   => null,
+					'models'		   => $this->models,
+					'prev'			   => null,
 					'validationMethod' => $this->validationMethod,
-					'messages'         => $this->messages,
+					'messages'		   => $this->messages,
 				);
-				$automation = array_merge($defualts,$automation);
+				$automation = array_merge($defualts, $automation);
 				extract($automation);
-				return $this->automate($nextStep,$models,$prev,$validationMethod,$messages);
+				return $this->automate($nextStep, $models, $prev, $validationMethod, $messages);
 			}
 		}
 		return true;
@@ -189,17 +202,17 @@ class TransitionComponent extends Object{
  * @return boolean Success
  * @access public
  */
-	function automate($nextStep,$models = null,$prev = null,$validationMethod = null,$messages = array()){
+	function automate($nextStep, $models = null, $prev = null, $validationMethod = null, $messages = array()) {
 		$c =& $this->_controller;
-		$messages = array_merge($this->messages,$messages);
+		$messages = array_merge($this->messages, $messages);
 
-		if($prev !== null){
-			if(!$this->checkPrev($prev,$messages['prev'])){
+		if ($prev !== null) {
+			if (!$this->checkPrev($prev, $messages['prev'])) {
 				return false;
 			}
 		}
-		if($nextStep !== null){
-			if(!$this->checkData($nextStep,$models,$validationMethod,$messages['invalid'])){
+		if ($nextStep !== null) {
+			if (!$this->checkData($nextStep, $models, $validationMethod, $messages['invalid'])) {
 				return false;
 			}
 		}
@@ -215,26 +228,26 @@ class TransitionComponent extends Object{
  * @return boolean Success
  * @access public
  */
-	function checkPrev($prev,$message = null,$prevAction = null){
-		if(is_array($prev)){
-			foreach($prev as $p){
-				if(!$this->checkPrev($p,$message,$prevAction)){
+	function checkPrev($prev, $message = null, $prevAction = null) {
+		if (is_array($prev)) {
+			foreach ($prev as $p) {
+				if (!$this->checkPrev($p, $message, $prevAction)) {
 					return false;
 				}
 			}
 			return true;
 		}
-		if($prevAction === null){
-			$prevAction = array('action'=>$prev);
+		if ($prevAction === null) {
+			$prevAction = array('action' => $prev);
 		}
-		if($message === null){
+		if ($message === null) {
 			$message = $this->messages['prev'];
 		}
-		if(!$this->Session->check($this->sessionKey($prev))){
-			if($message !== false){
+		if (!$this->Session->check($this->sessionKey($prev))) {
+			if ($message !== false) {
 				$this->Session->setFlash($message, $this->flashParams['element'], $this->flashParams['params'], $this->flashParams['key']);
 			}
-			if($this->autoRedirect){
+			if ($this->autoRedirect) {
 				$this->_controller->redirect($prevAction);
 			}
 			return false;
@@ -243,7 +256,7 @@ class TransitionComponent extends Object{
 	}
 
 /**
- * Check data of current controller with auto validation , auto redirection , auto setFlash() ,  and auto restoring data
+ * Check data of current controller with auto validation , auto redirection , auto setFlash() ,	 and auto restoring data
  *
  * @param mixed $nextStep Next step url (will be given Controller::redirect())
  * @param mixed $models Models for validation
@@ -253,41 +266,42 @@ class TransitionComponent extends Object{
  * @return boolean Success
  * @access public
  */
-	function checkData($nextStep = null,$models = null,$validationMethod = null,$message = null,$sessionKey = null){
+	function checkData($nextStep = null, $models = null, $validationMethod = null, $message = null, $sessionKey = null) {
 		$models = $this->_autoLoadModels($models);
 		$c =& $this->_controller;
-		if($sessionKey === null){
+		if ($sessionKey === null) {
 			$sessionKey = $this->action;
 		}
 
-		if($message === null){
+		if ($message === null) {
 			$message = $this->messages['invalid'];
 		}
-		if(!empty($c->data)){
-			$this->setData($sessionKey,$c->data);
+		if (!empty($c->data)) {
+			$this->setData($sessionKey, $c->data);
 
-			if($models === null){
-				$result = $this->validateModel(null);
-			}else{
+			if (is_array($models)) {
 				$result = true;
-				foreach($models as $model){
-					if( !$this->validateModel($model) ){
+				foreach ($models as $model) {
+					if ( !$this->validateModel($model) ) {
 						$result = false;
 					}
 				}
+			} else {
+				$result = $this->validateModel(null);
 			}
-			if($result){
-				if($nextStep !== null && $this->autoRedirect){
-					$nextStep = !is_array($nextStep)?array('action'=>$nextStep):$nextStep;
+
+			if ($result) {
+				if ($nextStep !== null && $this->autoRedirect) {
+					$nextStep = !is_array($nextStep) ? array('action' => $nextStep) : $nextStep;
 					$c->redirect($nextStep);
 				}
-			}else{
-				if($message !== false){
+			} else {
+				if ($message !== false) {
 					$this->Session->setFlash($message, $this->flashParams['element'], $this->flashParams['params'], $this->flashParams['key']);
 				}
 				return false;
 			}
-		}elseif($this->autoComplete && $this->Session->check($this->sessionKey($sessionKey))){
+		} elseif ($this->autoComplete && $this->Session->check($this->sessionKey($sessionKey))) {
 			$c->data = $this->data($sessionKey);
 		}
 
@@ -302,8 +316,8 @@ class TransitionComponent extends Object{
  * @return boolean Success
  * @access public
  */
-	function validateModel($model,$validationMethod = null){
-		if($validationMethod === null){
+	function validateModel($model, $validationMethod = null) {
+		if ($validationMethod === null) {
 			$validationMethod = $this->validationMethod;
 		}
 
@@ -312,32 +326,32 @@ class TransitionComponent extends Object{
 		/**
 		 * Loading Model object.
 		 */
-		if(!is_object($model) && $model !== null){
+		if (!is_object($model) && $model !== null) {
 			$controllerModel = $c->modelClass;
 			$modelName = Inflector::classify($model);
 
 			$controllerHasModel =
-				property_exists($c,$modelName) ||
-				property_exists($c->{$controllerModel},$modelName)
+				property_exists($c, $modelName) ||
+				property_exists($c->{$controllerModel}, $modelName)
 			;
-			if( $controllerHasModel ){
-				$model = property_exists($c->{$controllerModel},$modelName)?$c->{$controllerModel}->{$modelName}:$c->{$modelName};
-				if(get_class($model) == 'AppModel'){
-					if(!class_exists($modelName)){
-						App::import('Model',$modelName);
+			if ( $controllerHasModel ) {
+				$model = property_exists($c->{$controllerModel}, $modelName) ? $c->{$controllerModel}->{$modelName} : $c->{$modelName};
+				if (get_class($model) == 'AppModel') {
+					if (!class_exists($modelName)) {
+						App::import('Model', $modelName);
 					}
-					if(!class_exists($modelName)){
+					if (!class_exists($modelName)) {
 						return false;
 					}
 					$model = new $modelName();
 				}
-			}else{
-				if(!class_exists($modelName)){
-					App::import('Model',$modelName);
+			} else {
+				if (!class_exists($modelName)) {
+					App::import('Model', $modelName);
 				}
-				if(!class_exists($modeName)){
+				if (!class_exists($modeName)) {
 					return false;
-				}else{
+				} else {
 					$model = new $modelName();
 				}
 			}
@@ -346,17 +360,17 @@ class TransitionComponent extends Object{
 		$data = $c->data;
 
 		// User method.
-		if($validationMethod !== null){
+		if ($validationMethod !== null) {
 			$isModelMethod =
 				is_array($validationMethod) &&
 				is_object(current($validationMethod)) &&
-				is_a(current($validationMethod),'Model')
+				is_a(current($validationMethod), 'Model')
 			;
 
-			if($isModelMethod || $model === null){
-				return call_user_func($validationMethod,$data);
-			}else{
-				return call_user_func($validationMethod,&$model,$data);
+			if ($isModelMethod || $model === null) {
+				return call_user_func($validationMethod, $data);
+			} else {
+				return call_user_func($validationMethod, &$model, $data);
 			}
 		}
 
@@ -365,15 +379,15 @@ class TransitionComponent extends Object{
 		// $this->_controller->debug($c->data);
 		$result = true;
 
-		if(!empty($data)){
+		if (!empty($data)) {
 			$model->set($data);
-			if(!$model->validates()){
+			if (!$model->validates()) {
 				$result = false;
 			}
 		}
 			//var_dump($model->beforeValidate());
 			// exit;
-		if(!$result){
+		if (!$result) {
 			// debugging in development
 			// $c->debug($model->validationErrors);
 		}
@@ -388,20 +402,20 @@ class TransitionComponent extends Object{
  * @return mixed Session data or null
  * @access protected
  */
-	function _autoLoadModels($models){
-		if($models === null){
-			if(!empty($this->models)){
+	function _autoLoadModels($models) {
+		if ($models === null) {
+			if (!empty($this->models)) {
 				return $this->models;
 			}
 			$c =& $this->_controller;
-			if($c->modelClass !== null && $c->{$c->modelClass}){
+			if ($c->modelClass !== null && $c->{$c->modelClass}) {
 				$models = $c->modelClass;
 			}
-		}elseif($model === false){
+		} elseif ($model === false) {
 			$models = null;
 		}
 
-		if($models !== null && !is_array($models)){
+		if ($models !== null && !is_array($models)) {
 			$models = array($models);
 		}
 		return $this->models = $models;
@@ -414,9 +428,9 @@ class TransitionComponent extends Object{
  * @return mixed Session data or null
  * @access public
  */
-	function data($key){
+	function data($key) {
 		$key = $this->sessionKey($key);
-		if($this->Session->check($key)){
+		if ($this->Session->check($key)) {
 			return $this->Session->read($key);
 		}
 		return null;
@@ -428,7 +442,7 @@ class TransitionComponent extends Object{
  * @return mixed Session data or null
  * @access public
  */
-	function allData(){
+	function allData() {
 		return $this->data(null);
 	}
 
@@ -438,15 +452,15 @@ class TransitionComponent extends Object{
  * @return mixed Merged session data or null
  * @access public
  */
-	function mergedData(){
+	function mergedData() {
 		$allData = $this->allData();
-		if(empty($allData)){
+		if (empty($allData)) {
 			return $allData;
 		}
 
 		$merged = array();
-		foreach($allData as $action => $data){
-			$merged = array_merge_recursive($merged , $data);
+		foreach ($allData as $action => $data) {
+			$merged = array_merge_recursive($merged, $data);
 		}
 
 		return $merged;
@@ -460,8 +474,8 @@ class TransitionComponent extends Object{
  * @return boolean Success
  * @access public
  */
-	function setData($key,$data){
-		return $this->Session->write($this->sessionKey($key),$data);
+	function setData($key, $data) {
+		return $this->Session->write($this->sessionKey($key), $data);
 	}
 
 /**
@@ -472,10 +486,10 @@ class TransitionComponent extends Object{
  * @return string Session key
  * @access public
  */
-	function sessionKey($key,$cname = null){
-		$key   = $key   === null ? "":".$key";
-		$cname = $cname === null ? ".".$this->_controller->name:".$cname";
-		return 'Transition'.$cname.$key;
+	function sessionKey($key, $cname = null) {
+		$key   = $key	=== null ? "" : ".$key";
+		$cname = $cname === null ? ".".$this->_controller->name : ".$cname";
+		return $this->sessionBaseKey . $cname . $key;
 	}
 
 /**
@@ -485,9 +499,9 @@ class TransitionComponent extends Object{
  * @return boolean Success
  * @access public
  */
-	function delData($key){
+	function delData($key) {
 		$key = $this->sessionKey($key);
-		if($this->Session->check($key)){
+		if ($this->Session->check($key)) {
 			return $this->Session->delete($key);
 		}
 	}
@@ -499,9 +513,9 @@ class TransitionComponent extends Object{
  * @return boolean Success
  * @access public
  */
-	function clearData(){
-		if($this->Session->check('Transition')){
-			return $this->Session->delete('Transition');
+	function clearData() {
+		if ($this->Session->check($this->sessionBaseKey)) {
+			return $this->Session->delete($this->sessionBaseKey);
 		}
 		return true;
 	}
