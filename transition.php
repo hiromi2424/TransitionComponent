@@ -411,7 +411,7 @@ class TransitionComponent extends Object {
 			if ($c->modelClass !== null && $c->{$c->modelClass}) {
 				$models = $c->modelClass;
 			}
-		} elseif ($model === false) {
+		} elseif ($models === false) {
 			$models = null;
 		}
 
