@@ -344,7 +344,7 @@ class TransitionComponent extends Object {
 				if (!class_exists($modelName)) {
 					App::import('Model', $modelName);
 				}
-				if (!class_exists($modeName)) {
+				if (!class_exists($modelName)) {
 					return false;
 				} else {
 					$model = new $modelName();
