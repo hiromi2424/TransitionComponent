@@ -73,7 +73,7 @@ class TransitionComponent extends Object {
  * @var array default messages with key
  * @access public
  */
-    var $flashParams = array();
+	var $flashParams = array();
 
 /**
  * Turns on or off auto loading session data to Controller::data.
@@ -156,7 +156,7 @@ class TransitionComponent extends Object {
 	}
 
 /**
- * Component startup. with automation options , It will automate.
+ * Component startup. Given automation options , It will automate.
  *
  * @param object $controller Instantiating controller
  * @return void
@@ -253,7 +253,7 @@ class TransitionComponent extends Object {
 /**
  * Check data of current controller with auto validation , auto redirection , auto setFlash() ,  and auto restoring data
  *
- * @param mixed $nextStep Next step url (will be given Controller::redirect())
+ * @param mixed $nextStep Next step url (will be passed to Controller::redirect())
  * @param mixed $models Models for validation
  * @param callback $validationMethod Method to validate
  * @param array $messages Messages to Controller::setFlash()
@@ -277,12 +277,12 @@ class TransitionComponent extends Object {
 			if (is_array($models)) {
 				$result = true;
 				foreach ($models as $model) {
-					if ( !$this->validateModel($model) ) {
+					if (!$this->validateModel($model)) {
 						$result = false;
 					}
 				}
 			} else {
-				$result = $this->validateModel(null);
+				$result = $this->validateModel($models);
 			}
 
 			if ($result) {
@@ -369,9 +369,6 @@ class TransitionComponent extends Object {
 			}
 		}
 
-
-		// $model->create();
-		// $this->_controller->debug($c->data);
 		$result = true;
 
 		if (!empty($data)) {
@@ -380,20 +377,15 @@ class TransitionComponent extends Object {
 				$result = false;
 			}
 		}
-			//var_dump($model->beforeValidate());
-			// exit;
-		if (!$result) {
-			// debugging in development
-			// $c->debug($model->validationErrors);
-		}
 
 		return $result;
 	}
 
 /**
  * Loading Default/UserSetting Model names.
- *
- * @param string $key Key name
+ * Given $models as null, try to load model name from Controller::modelClass
+ * 
+ * @param mixed $models a name or array of names
  * @return mixed Session data or null
  * @access protected
  */
@@ -494,11 +486,22 @@ class TransitionComponent extends Object {
  * @return boolean Success
  * @access public
  */
-	function delData($key) {
+	function deleteData($key) {
 		$key = $this->sessionKey($key);
 		if ($this->Session->check($key)) {
 			return $this->Session->delete($key);
 		}
+	}
+
+/**
+ * Alias for deleteData().
+ *
+ * @param string $key Key name
+ * @return boolean Success
+ * @access public
+ */
+	function delData($key) {
+		return $this->deleteData($key);
 	}
 
 /**
