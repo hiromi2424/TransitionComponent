@@ -277,12 +277,12 @@ class TransitionComponent extends Object {
 			if (is_array($models)) {
 				$result = true;
 				foreach ($models as $model) {
-					if (!$this->validateModel($model)) {
+					if (!$this->validateModel($model, $validationMethod)) {
 						$result = false;
 					}
 				}
 			} else {
-				$result = $this->validateModel($models);
+				$result = $this->validateModel($models, $validationMethod);
 			}
 
 			if ($result) {
@@ -384,7 +384,7 @@ class TransitionComponent extends Object {
 /**
  * Loading Default/UserSetting Model names.
  * Given $models as null, try to load model name from Controller::modelClass
- * 
+ *
  * @param mixed $models a name or array of names
  * @return mixed Session data or null
  * @access protected
