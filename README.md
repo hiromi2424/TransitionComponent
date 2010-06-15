@@ -1,10 +1,10 @@
-* Transition Component
+# Transition Component #
 
-** Version **
+## Version ##
 
 This was versioned as 1.0 stable.
 
-** Introduction **
+## Introduction ##
 
 Transition component is a CakePHP component to help your transitional pages logic.
 This works almost part of wizard.
@@ -13,12 +13,12 @@ function action(){
 	$this->Transition->automate('nextAction','Model','prevAction');
 }
 
-** Requirements **
+## Requirements ##
 
 CakePHP >= 1.2
 PHP >= 4 (probably)
 
-** Setup **
+## Setup ##
 
 With console:
 	cd /path/to/app/controllers/components
@@ -27,13 +27,13 @@ With console:
 In controller's property section:
 	var $components = array( ... , 'Transition');
 
-** Summary **
+## Summary ##
 
 - checkData() is to check data(if given) with model validation and auto redirecting
 - checkPrev() is to check previous page's session data exists.
 - automate() is convenient method for checkData() and checkPrev().
 
-** Sample **
+## Sample ##
 
 	class UsersController extends AppController{
 		var $components = array('Transition');
