@@ -333,22 +333,15 @@ class TransitionComponent extends Object {
 			if ( $controllerHasModel ) {
 				$model = property_exists($c->{$controllerModel}, $modelName) ? $c->{$controllerModel}->{$modelName} : $c->{$modelName};
 				if (get_class($model) == 'AppModel') {
-					if (!class_exists($modelName)) {
-						App::import('Model', $modelName);
-					}
-					if (!class_exists($modelName)) {
+					$model =& ClassRegistry::init($modelName);
+					if (empty($model) || !class_exists($modelName)) {
 						return false;
 					}
-					$model = new $modelName();
 				}
 			} else {
-				if (!class_exists($modelName)) {
-					App::import('Model', $modelName);
-				}
-				if (!class_exists($modelName)) {
+				$model =& ClassRegistry::init($modelName);
+				if (empty($model) || !class_exists($modelName)) {
 					return false;
-				} else {
-					$model = new $modelName();
 				}
 			}
 		}
