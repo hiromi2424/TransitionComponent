@@ -1,6 +1,6 @@
-* Transition Component *
+* Transition Component
 
-* Version *
+** Version **
 
 This was versioned as 1.0 stable.
 
