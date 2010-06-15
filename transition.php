@@ -7,7 +7,7 @@
  * @copyright     Copyright 2010, hiromi
  * @package       cake
  * @subpackage    cake.app.controllers.components.transition
- * @version       1.0 RC2
+ * @version       1.0
  * @license       Free
  */
 

@@ -6,4 +6,4 @@ function action(){
 	$this->Transition->automate('nextAction','Model','prevAction');
 }
 
-Version 1.0 RC2
+Version 1.0
