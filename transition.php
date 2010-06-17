@@ -436,18 +436,23 @@ class TransitionComponent extends Object {
 /**
  * Get merged session data.
  *
+ * @param string $callback Callback method to merging. valid callback type or Sring like "Set::merge" can be accepted.
  * @return mixed Merged session data or null
  * @access public
  */
-	function mergedData() {
+	function mergedData($callback = 'Set::merge') {
 		$allData = $this->allData();
 		if (empty($allData)) {
 			return $allData;
 		}
+		if(!is_array($callback)) {
+			@list($class, $func) = explode('::', $callback);
+			$callback = !empty($func) ? array($class, $func) : $class;
+		}
 
 		$merged = array();
 		foreach ($allData as $action => $data) {
-			$merged = Set::merge($merged, $data);
+			$merged = call_user_func($callback, $merged, $data);
 		}
 
 		return $merged;
@@ -476,9 +481,7 @@ class TransitionComponent extends Object {
  */
 	function deleteData($key) {
 		$key = $this->sessionKey($key);
-		if ($this->Session->check($key)) {
-			return $this->Session->delete($key);
-		}
+		return $this->Session->delete($key);
 	}
 
 /**
