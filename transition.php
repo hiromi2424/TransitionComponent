@@ -184,7 +184,7 @@ class TransitionComponent extends Object {
 					'validationMethod' => $this->validationMethod,
 					'messages'		   => $this->messages,
 				);
-				$automation = array_merge($defualts, $automation);
+				$automation = array_merge($defaults, $automation);
 				extract($automation);
 				return $this->automate($nextStep, $models, $prev, $validationMethod, $messages);
 			}
@@ -332,26 +332,22 @@ class TransitionComponent extends Object {
 			$modelName = Inflector::classify($model);
 
 			$controllerHasModel =
-				property_exists($c, $modelName) ||
-				property_exists($c->{$controllerModel}, $modelName)
+				isset($c->{$modelName}) ||
+				isset($c->{$controllerModel}->{$modelName})
 			;
-			if ( $controllerHasModel ) {
-				$model = property_exists($c->{$controllerModel}, $modelName) ? $c->{$controllerModel}->{$modelName} : $c->{$modelName};
-				if (get_class($model) == 'AppModel') {
-					$model =& ClassRegistry::init($modelName);
-					if (empty($model) || !class_exists($modelName)) {
-						return false;
-					}
+			if ($controllerHasModel) {
+				if( isset($c->{$controllerModel}->{$modelName})) {
+					$model =& $c->{$controllerModel}->{$modelName};
+				} else {
+					$model =& $c->{$modelName};
 				}
 			} else {
 				$model =& ClassRegistry::init($modelName);
-				if (empty($model) || !class_exists($modelName)) {
-					return false;
-				}
 			}
 		}
 
 		$data = $c->data;
+		$result = true;
 
 		// User method.
 		if ($validationMethod !== null) {
@@ -362,15 +358,13 @@ class TransitionComponent extends Object {
 			;
 
 			if ($isModelMethod || $model === null) {
-				return call_user_func($validationMethod, $data);
+				$result = call_user_func($validationMethod, $data);
 			} else {
-				return call_user_func($validationMethod, &$model, $data);
+				$result = call_user_func($validationMethod, $model, $data);
 			}
 		}
 
-		$result = true;
-
-		if (!empty($data)) {
+		if (!empty($data) && is_object($model)) {
 			$model->set($data);
 			if (!$model->validates()) {
 				$result = false;
@@ -423,6 +417,18 @@ class TransitionComponent extends Object {
 	}
 
 /**
+ * Set session data with key.
+ *
+ * @param string $key Key name
+ * @param mixed $data data to set
+ * @return boolean Success
+ * @access public
+ */
+	function setData($key, $data) {
+		return $this->Session->write($this->sessionKey($key), $data);
+	}
+
+/**
  * Get all of session data.
  *
  * @return mixed Session data or null
@@ -446,22 +452,10 @@ class TransitionComponent extends Object {
 
 		$merged = array();
 		foreach ($allData as $action => $data) {
-			$merged = array_merge_recursive($merged, $data);
+			$merged = Set::merge($merged, $data);
 		}
 
 		return $merged;
-	}
-
-/**
- * Set session data with key.
- *
- * @param string $key Key name
- * @param mixed $data data to set
- * @return boolean Success
- * @access public
- */
-	function setData($key, $data) {
-		return $this->Session->write($this->sessionKey($key), $data);
 	}
 
 /**
@@ -474,7 +468,7 @@ class TransitionComponent extends Object {
  */
 	function sessionKey($key, $cname = null) {
 		$key   = $key	=== null ? "" : ".$key";
-		$cname = $cname === null ? ".".$this->_controller->name : ".$cname";
+		$cname = $cname === null ? "." . $this->_controller->name : ".$cname";
 		return $this->sessionBaseKey . $cname . $key;
 	}
 

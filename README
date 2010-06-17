@@ -1,9 +1,0 @@
-Transition component will help transition of your pages.
-Among your pages that contain forms,It acts auto validation and auto redirect.
-
-Almost every case,Your function of action can be one-liner as following code:
-function action(){
-	$this->Transition->automate('nextAction','Model','prevAction');
-}
-
-Version 1.0
