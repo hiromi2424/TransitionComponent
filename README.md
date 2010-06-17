@@ -9,14 +9,14 @@ This was versioned as 1.0 stable.
 Transition component is a CakePHP component to help your transitional pages logic.
 This works almost part of wizard.
 Almost every case, your mehod for action can be one-liner as following code:
-function action(){
-	$this->Transition->automate('nextAction','Model','prevAction');
-}
+	function action(){
+		$this->Transition->automate('nextAction','Model','prevAction');
+	}
 
 ## Requirements ##
 
-CakePHP >= 1.2
-PHP >= 4 (probably)
+- CakePHP >= 1.2
+- PHP >= 4 (probably)
 
 ## Setup ##
 

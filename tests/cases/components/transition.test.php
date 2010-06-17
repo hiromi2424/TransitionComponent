@@ -331,19 +331,25 @@ class TransitionComponentTest extends CakeTestCase {
 		$t =& $c->Transition;
 		$s =& $t->Session;
 
-		$t->setData('param1', 'hoge');
-		$expected = 'hoge';
+		$t->setData('param1', array('testdata' => 'hoge'));
+		$expected = array('testdata' => 'hoge');
 		
 		$this->assertEqual($s->read($this->sessionBaseKey . '.param1'), $expected);
 		$this->assertEqual($t->data('param1'), $expected);
 		$this->assertEqual($t->data('param2'), null);
-		$this->assertEqual($t->allData(), array('param1' => 'hoge'));
+		$this->assertEqual($t->allData(), array('param1' => $expected));
 		
 		$this->assertTrue($t->setData('param2', array('User' => array('id' => 1, 'name' => 'user1', 'age' => 46))));
 		$this->assertTrue($t->setData('param3', array('User' => array('id' => 2, 'name' => 'user2'))));
 
-		$expected = array('hoge', 'User' => array('id' => 2, 'name' => 'user2', 'age' => 46));
+		$expected = array('testdata' => 'hoge', 'User' => array('id' => 2, 'name' => 'user2', 'age' => 46));
 		$this->assertEqual($t->mergedData(), $expected);
+		$this->assertEqual($t->mergedData(array('Set', 'merge')), $expected);
+		$expected = array('testdata' => 'hoge', 'User' => array('id' => 1, 'name' => 'user1', 'age' => 46));
+		$this->assertEqual($t->mergedData('Set::pushDiff'), $expected);
+		$this->assertEqual($t->mergedData(array('Set', 'pushDiff')), $expected);
+		$expected = array('testdata' => 'hoge', 'User' => array('id' => array(1, 2), 'name' => array('user1', 'user2'), 'age' => 46));
+		$this->assertEqual($t->mergedData('array_merge_recursive'), $expected);
 
 		$this->assertTrue($t->deleteData('param2'));
 		$this->assertFalse($s->check($this->sessionBaseKey . '.param2'));
@@ -355,5 +361,6 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->assertNull($t->mergedData());
 		$this->assertTrue($t->clearData());
 		$this->assertFalse($t->delData(null));
+		$this->assertFalse($t->deleteData('param2'));
 	}
 }
