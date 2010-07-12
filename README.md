@@ -7,22 +7,23 @@ This was versioned as 1.0 stable.
 ## Introduction ##
 
 Transition component is a CakePHP component to help your transitional pages logic.
-This works almost part of wizard.
-Almost every case, your mehod for action can be one-liner as following code:
-	function action(){
-		$this->Transition->automate('nextAction','Model','prevAction');
-	}
+
+- For instance, this bears most wizard parts.
+- In almost every case, your method for action can be one-liner as like following codes:
+		function action(){
+			$this->Transition->automate('next_action', 'YourModel', 'previous_action');
+		}
 
 ## Requirements ##
 
 - CakePHP >= 1.2
-- PHP >= 4 (probably)
+- PHP >= 4
 
 ## Setup ##
 
 With console:
 	cd /path/to/app/controllers/components
-	git clone git://github.com/hiromi2424/TransitionComponent.git
+	git clone git://github.com/hiromi2424/TransitionComponent.git transition
 
 In controller's property section:
 	var $components = array( ... , 'Transition');
@@ -38,12 +39,12 @@ In controller's property section:
 	class UsersController extends AppController{
 		var $components = array('Transition');
 		// base of user information
-		function register(){
+		function register() {
 			// give a next action name
 			$this->Transition->checkData('register_enquete');
 		}
 		// input enquete
-		function register_enquete(){
+		function register_enquete() {
 			$this->Transition->automate(
 				'register_confirm', // next action
 				'Enquete', // model name to validate
@@ -51,18 +52,18 @@ In controller's property section:
 			);
 		}
 		// confirm inputs
-		function register_confirm(){
+		function register_confirm() {
 			$this->Transition->automate(
 				'register_save', // next
 				null, // validate with current model
 				'register_enquete', // prev
 				'validateCaptcha' // virtual function to validate with captcha
 			 );
-			$this->set('data',$this->Transition->allData());
-			$this->set('captcha',createCaptcha()); // virtual function to create a captcha
+			$this->set('data', $this->Transition->allData());
+			$this->set('captcha', createCaptcha()); // virtual function to create a captcha
 		}
-		// save action
-		function register_save(){
+		// stroring inputs
+		function register_save() {
 			// As like this, multi action name can be accepted
 			$this->Transition->checkPrev(array(
 				'register',
@@ -70,15 +71,14 @@ In controller's property section:
 				'register_confirm'
 			));
 			// mergedData() returns all session data saved on the actions merged
-			if($this->User->saveAll($this->Transition->mergedData()){
-				// clear all of session data TransitionComponent uses
+			if ($this->User->saveAll($this->Transition->mergedData()) {
+				// Clear all of session data TransitionComponent uses
 				$this->Transition->clearData();
-				$this->Session->setFlash(__('Register complete !!',true));
-				$this->redirect(aa('action','index'));
-			}else{
-				$this->Session->setFlash(__('Register failed ...',true));
-				$this->redirect(aa('action','register'));
+				$this->Session->setFlash(__('Registration complete !!', true));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('Registration failed ...', true));
+				$this->redirect(array('action' => 'register'));
 			}
 		}
 	}
-
