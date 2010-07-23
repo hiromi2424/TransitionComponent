@@ -150,11 +150,6 @@ class TransitionComponent extends Object {
 			'params' => array(),
 			'key' => 'flash',
 		);
-		$this->flashParams = array(
-			'element' => 'default',
-			'params' => array(),
-			'key' => 'flash'
-		);
 		// configure.
 		$this->_set($settings);
 		$this->_controller =& $controller;
