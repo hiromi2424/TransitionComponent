@@ -40,7 +40,7 @@ class NormalValidation extends CakeTestModel {
 	var $name = 'NormalValidation';
 	var $useTable = false;
 	var $validate = array('max25char' => array('rule' => array('maxLength', 25)));
-	
+
 	function triggerError($data) {
 		foreach ($data[$this->name] as $key => $val) {
 			$this->invalidate($key, $val);
@@ -82,19 +82,19 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->__shutdownController();
 		parent::end();
 	}
-	
+
 	function __loadController($params = array()) {
 		if ($this->Controller !== null) {
 			$this->__shutdownController();
 			unset($this->Controller);
 		}
-		
+
 		$controllerName = 'Test';
 		if (!empty($params['controller'])) {
 			$controllerName = $params['controller'];
 			unset($params['controller']);
 		}
-		
+
 		$controllerName = 'TransitionComponent' . $controllerName . 'Controller';
 		$Controller = new $controllerName();
 		$Controller->params = array(
@@ -106,9 +106,9 @@ class TransitionComponentTest extends CakeTestCase {
 		$Controller->Component->initialize($Controller);
 		$Controller->beforeFilter();
 		$Controller->Component->startup($Controller);
-		$this->Controller =& $Controller;
+		$this->Controller = $Controller;
 		
-		$this->sessionBaseKey = "Transition." . $Controller->name;
+		$this->sessionBaseKey = "Transition." . Inflector::underscore($Controller->name);
 	}
 
 	function __shutdownController() {
@@ -118,9 +118,9 @@ class TransitionComponentTest extends CakeTestCase {
 	}
 
 	function testStartup() {
-		$c =& $this->Controller;
-		$t =& $c->Transition;
-		$s =& $t->Session;
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$s = $t->Session;
 		
 		$t->automation = true;
 		$this->assertTrue($t->startup($c));
@@ -135,9 +135,9 @@ class TransitionComponentTest extends CakeTestCase {
 
 	function testAutomate() {
 		$this->__loadController();
-		$c =& $this->Controller;
-		$t =& $c->Transition;
-		$s =& $t->Session;
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$s = $t->Session;
 		$c->data = array('dummy');
 
 		$this->assertTrue($t->automate(null));
@@ -151,8 +151,8 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->assertTrue($t->automate('next_action', 'ValidationSuccess', 'prev_action'));
 
 		$c->data = array('NormalValidation' => array('max25char' => 'this will be handled as invalid'));
-		$NormalValidation =& ClassRegistry::init('NormalValidation');
-		$result = $t->automate('next_action', 'ValidationSuccess', 'prev_action', array(&$NormalValidation, 'triggerError'), array('invalid' => 'validation failed'));
+		$NormalValidation = ClassRegistry::init('NormalValidation');
+		$result = $t->automate('next_action', 'ValidationSuccess', 'prev_action', array($NormalValidation, 'triggerError'), array('invalid' => 'validation failed'));
 		$this->assertFalse($result);
 		$this->assertEqual($s->read('Message.flash.message'), 'validation failed');
 		$this->assertFalse(empty($NormalValidation->validationErrors));
@@ -165,9 +165,9 @@ class TransitionComponentTest extends CakeTestCase {
 	}
 
 	function testCheckPrev() {
-		$c =& $this->Controller;
-		$t =& $c->Transition;
-		$s =& $t->Session;
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$s = $t->Session;
 
 		$result = $t->checkPrev('unknown');
 		$this->assertFalse($result);
@@ -193,9 +193,9 @@ class TransitionComponentTest extends CakeTestCase {
 	}
 
 	function testCheckData() {
-		$c =& $this->Controller;
-		$t =& $c->Transition;
-		$s =& $t->Session;
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$s = $t->Session;
 		$c->data = array();
 
 		$this->assertTrue($t->checkData());
@@ -231,14 +231,14 @@ class TransitionComponentTest extends CakeTestCase {
 
 	function testValidateModel() {
 		$this->__loadController();
-		$c =& $this->Controller;
-		$t =& $c->Transition;
+		$c = $this->Controller;
+		$t = $c->Transition;
 
 		$c->data = array($c->modelClass => array('dummy' => 2));
 
-		$Success =& ClassRegistry::init('ValidationSuccess');
-		$Fail =& ClassRegistry::init('ValidationFail');
-		$NormalValidation =& ClassRegistry::init('NormalValidation');
+		$Success = ClassRegistry::init('ValidationSuccess');
+		$Fail = ClassRegistry::init('ValidationFail');
+		$NormalValidation = ClassRegistry::init('NormalValidation');
 
 		$this->assertTrue($t->validateModel('NotExistModel'));
 
@@ -253,13 +253,13 @@ class TransitionComponentTest extends CakeTestCase {
 
 		$this->assertTrue($t->validateModel($Success));
 		$this->assertFalse($t->validateModel($Fail));
-		$this->assertTrue($t->validateModel(null, array(&$Success, 'validates')));
-		$this->assertFalse($t->validateModel(null, array(&$Fail, 'validates')));
+		$this->assertTrue($t->validateModel(null, array($Success, 'validates')));
+		$this->assertFalse($t->validateModel(null, array($Fail, 'validates')));
 	
-		$this->assertFalse($t->validateModel('ValidationSuccess', array(&$Fail, 'validates')));
-		$this->assertFalse($t->validateModel('ValidationFail', array(&$Success, 'validates')));
-		$this->assertFalse($t->validateModel($Success, array(&$Fail, 'validates')));
-		$this->assertTrue($t->validateModel($Success, array(&$Success, 'validates')));
+		$this->assertFalse($t->validateModel('ValidationSuccess', array($Fail, 'validates')));
+		$this->assertFalse($t->validateModel('ValidationFail', array($Success, 'validates')));
+		$this->assertFalse($t->validateModel($Success, array($Fail, 'validates')));
+		$this->assertTrue($t->validateModel($Success, array($Success, 'validates')));
 
 		$this->assertTrue($t->validateModel($Success, array(new ObjectValidation, 'validates')));
 
@@ -277,23 +277,23 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->assertTrue(empty($NormalValidation->validationErrors));
 
 		$this->__loadController(array('controller' => 'AppModel'));
-		$c =& $this->Controller;
-		$t =& $c->Transition;
+		$c = $this->Controller;
+		$t = $c->Transition;
 		$c->data = array('NormalValidation' => array('max25char' => 'This column will be failed because of too long string'));
 
 		$this->assertTrue($t->validateModel('TransitionPost'));
 
-		$TransitionPost =& ClassRegistry::init('TransitionPost');
-		$result = $t->validateModel('NormalValidation', array(&$TransitionPost, 'validates'));
+		$TransitionPost = ClassRegistry::init('TransitionPost');
+		$result = $t->validateModel('NormalValidation', array($TransitionPost, 'validates'));
 
 		$this->assertFalse($result);
 		$this->assertFalse(empty($NormalValidation->validationErrors));
 	}
-	
+
 	function testAutoLoadModels() {
 		$this->__loadController();
-		$c =& $this->Controller;
-		$t =& $c->Transition;
+		$c = $this->Controller;
+		$t = $c->Transition;
 
 		$this->assertEqual($t->_autoLoadModels(null), array('TransitionModel'));
 		$this->assertEqual($t->_autoLoadModels(false), null);
@@ -304,32 +304,37 @@ class TransitionComponentTest extends CakeTestCase {
 		$object = new Object();
 		$this->assertIdentical($t->_autoLoadModels($object), array($object));
 	}
-	
+
 	function testSessionKey() {
 		$this->__loadController();
-		$c =& $this->Controller;
-		$t =& $c->Transition;
+		$c = $this->Controller;
+		$t = $c->Transition;
 
 		$this->assertEqual($t->sessionKey(null), $this->sessionBaseKey);
-		$this->assertEqual($t->sessionKey('my_key'), 'Transition.TransitionComponentTest.my_key');
+		$this->assertEqual($t->sessionKey('my_key'), 'Transition.transition_component_test.my_key');
 		$this->assertEqual($t->sessionKey('my_key', 'my_controller_key'), 'Transition.my_controller_key.my_key');
+		$this->assertEqual($t->sessionKey(array('controller' => 'my_controller')), 'Transition.my_controller');
+		$this->assertEqual($t->sessionKey(array('controller' => 'MyController')), 'Transition.MyController');
+		$this->assertEqual($t->sessionKey(array('controller' => '')), 'Transition.');
+		$this->assertEqual($t->sessionKey(array('controller' => ' ')), 'Transition. ');
+		$this->assertEqual($t->sessionKey(array('controller' => 'my_controller', 'action' => 'my_action')), 'Transition.my_controller.my_action');
 
 		$t->sessionBaseKey = 'my_sessionkey';
-		$this->assertEqual($t->sessionKey(null), 'my_sessionkey.TransitionComponentTest');
+		$this->assertEqual($t->sessionKey(null), 'my_sessionkey.transition_component_test');
 
 		$c->name = 'my_controller';
 		$result = $t->sessionKey(null);
 		$this->assertEqual($result, 'my_sessionkey.my_controller');
-		
+
 		$t->sessionBaseKey = 'Transition';
 		$c->name = 'TransitionComponentTest';
 	}
 	
 	function testDataMethods() {
 		$this->__loadController();
-		$c =& $this->Controller;
-		$t =& $c->Transition;
-		$s =& $t->Session;
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$s = $t->Session;
 
 		$t->setData('param1', array('testdata' => 'hoge'));
 		$expected = array('testdata' => 'hoge');
@@ -337,7 +342,7 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->assertEqual($s->read($this->sessionBaseKey . '.param1'), $expected);
 		$this->assertEqual($t->data('param1'), $expected);
 		$this->assertEqual($t->data('param2'), null);
-		$this->assertEqual($t->allData(), array('param1' => $expected));
+		$this->assertEqual($t->allData(), array('transition_component_test' => array('param1' => $expected)));
 		
 		$this->assertTrue($t->setData('param2', array('User' => array('id' => 1, 'name' => 'user1', 'age' => 46))));
 		$this->assertTrue($t->setData('param3', array('User' => array('id' => 2, 'name' => 'user2'))));

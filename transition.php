@@ -486,8 +486,12 @@ class TransitionComponent extends Object {
 		if (is_array($key) && isset($key['controller'])) {
 			$cname = $key['controller'];
 		}
-		if (is_array($key) && isset($key['action'])) {
-			$key = $key['action'];
+		if (is_array($key)) {
+			if (isset($key['action'])) {
+				$key = $key['action'];
+			} else {
+				$key = null;
+			}
 		}
 		$key = $key === null ? "" : ".$key";
 		if ($cname === null) {
