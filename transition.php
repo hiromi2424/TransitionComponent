@@ -7,7 +7,7 @@
  * @copyright     Copyright 2010, hiromi
  * @package       cake
  * @subpackage    cake.app.controllers.components.transition
- * @version       1.0.1
+ * @version       1.1 alpha
  * @license       Free
  */
 
@@ -134,6 +134,14 @@ class TransitionComponent extends Object {
  */
 	var $sessionBaseKey = 'Transition';
 
+/**
+ * Inflection method for controller name. 
+ * if controller name was detected from current controller, this method was applied to controller name.
+ *
+ * @var string method name for Inflector
+ * @access public
+ */
+	var $controllerInflection = 'underscore';
 
 /**
  * Initialize the TransitionComponent
@@ -224,7 +232,7 @@ class TransitionComponent extends Object {
  * @access public
  */
 	function checkPrev($prev, $message = null, $prevAction = null) {
-		if (is_array($prev)) {
+		if (is_array($prev) && Set::numeric(array_keys($prev))) {
 			foreach ($prev as $p) {
 				if (!$this->checkPrev($p, $message, $prevAction)) {
 					return false;
@@ -232,12 +240,19 @@ class TransitionComponent extends Object {
 			}
 			return true;
 		}
+		$check = true;
+
+		if (!is_array($prev)) {
+			$prev = array('action' => $prev);
+		}
+
 		if ($prevAction === null) {
-			$prevAction = array('action' => $prev);
+			$prevAction = $prev;
 		}
 		if ($message === null) {
 			$message = $this->messages['prev'];
 		}
+
 		if (!$this->Session->check($this->sessionKey($prev))) {
 			if ($message !== false) {
 				$this->Session->setFlash($message, $this->flashParams['element'], $this->flashParams['params'], $this->flashParams['key']);
@@ -429,7 +444,7 @@ class TransitionComponent extends Object {
  * @access public
  */
 	function allData() {
-		return $this->data(null);
+		return $this->Session->read($this->sessionBaseKey);
 	}
 
 /**
@@ -450,8 +465,10 @@ class TransitionComponent extends Object {
 		}
 
 		$merged = array();
-		foreach ($allData as $action => $data) {
-			$merged = call_user_func($callback, $merged, $data);
+		foreach ($allData as $controller => $actions) {
+			foreach ($actions as $action => $data) {
+				$merged = call_user_func($callback, $merged, $data);
+			}
 		}
 
 		return $merged;
@@ -460,14 +477,25 @@ class TransitionComponent extends Object {
 /**
  * Get Session key.
  *
- * @param string $key Key name
- * @param string $cname controller name(deprecated argument)
+ * @param mixed $key Key name or url parameter array
+ * @param string $cname controller name(optional)
  * @return string Session key
  * @access public
  */
 	function sessionKey($key, $cname = null) {
-		$key   = $key   === null ? "" : ".$key";
-		$cname = $cname === null ? "." . $this->_controller->name : ".$cname";
+		if (is_array($key) && isset($key['controller'])) {
+			$cname = $key['controller'];
+		}
+		if (is_array($key) && isset($key['action'])) {
+			$key = $key['action'];
+		}
+		$key = $key === null ? "" : ".$key";
+		if ($cname === null) {
+			$method = $this->controllerInflection;
+			$cname = '.' . Inflector::$method($this->_controller->name);
+		} else {
+			$cname = ".$cname";
+		}
 		return $this->sessionBaseKey . $cname . $key;
 	}
 
