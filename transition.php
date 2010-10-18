@@ -7,7 +7,7 @@
  * @copyright     Copyright 2010, hiromi
  * @package       cake
  * @subpackage    cake.app.controllers.components.transition
- * @version       1.0
+ * @version       1.0.1
  * @license       Free
  */
 
@@ -74,7 +74,11 @@ class TransitionComponent extends Object {
  * @var array default messages with key
  * @access public
  */
-	var $flashParams = array();
+	var $flashParams = array(
+		'element' => 'default',
+		'params' => array(),
+		'key' => 'flash',
+	);
 
 /**
  * Turns on or off auto loading session data to Controller::data.
@@ -144,11 +148,6 @@ class TransitionComponent extends Object {
 		$this->messages = array(
 			'invalid' => __('Input Data was not able to pass varidation. Please, try again.', true),
 			'prev'    => __('Session timed out.', true),
-		);
-		$this->flashParams = array(
-			'element' => 'default',
-			'params' => array(),
-			'key' => 'flash',
 		);
 		// configure.
 		$this->_set($settings);
@@ -252,7 +251,7 @@ class TransitionComponent extends Object {
 	}
 
 /**
- * Check data of current controller with auto validation , auto redirection , auto setFlash() ,  and auto restoring data
+ * Checking data of current controller with auto validation , auto redirection , auto setFlash() , and auto restoring data
  *
  * @param mixed $nextStep Next step url (will be passed to Controller::redirect())
  * @param mixed $models Models for validation
@@ -436,7 +435,7 @@ class TransitionComponent extends Object {
 /**
  * Get merged session data.
  *
- * @param string $callback Callback method to merging. valid callback type or Sring like "Set::merge" can be accepted.
+ * @param string $callback Callback method to merging. valid callback type or Sring like "Set::merge" can be accepted.(optional)
  * @return mixed Merged session data or null
  * @access public
  */
