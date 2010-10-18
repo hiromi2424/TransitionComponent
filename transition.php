@@ -4,11 +4,11 @@
  *
  * PHP versions 4 and 5 , CakePHP => 1.2
  *
- * @copyright	  Copyright 2010, hiromi
- * @package		  cake
- * @subpackage	  cake.app.controllers.components.transition
- * @version		  1.0
- * @license		  Free
+ * @copyright     Copyright 2010, hiromi
+ * @package       cake
+ * @subpackage    cake.app.controllers.components.transition
+ * @version       1.0.1
+ * @license       Free
  */
 
 
@@ -17,8 +17,8 @@
  * Among form pages , auto validation and auto redirect.
  * This will use Session.
  *
- * @package		  cake
- * @subpackage	  cake.app.controllers.components.transition
+ * @package       cake
+ * @subpackage    cake.app.controllers.components.transition
  */
 
 class TransitionComponent extends Object {
@@ -36,18 +36,18 @@ class TransitionComponent extends Object {
  * When Array given, This automate within these key as actions.
  *
  * Example.
- * // beforeFilter	in controller
+ * // beforeFilter  in controller
  * $this->Transition->automation = array(
- *	 'action' => array(
- *	   'nextStep'		   => 'nextAction',
- *	   'models'			   => array('Model1', 'Model2'),
- *	   'prev'			   => 'prevAction',
- *	   'validationMethod'  => array(&$this->Model3, 'behaviorMethod'),
- *	   'messages'		   => array(
- *		 'invalid' => __('your input was wrong.', true),
- *		 'prev'	   => __('wrong transition.', true),
- *	   ),
- *	 )
+ *   'action' => array(
+ *     'nextStep'          => 'nextAction',
+ *     'models'            => array('Model1', 'Model2'),
+ *     'prev'              => 'prevAction',
+ *     'validationMethod'  => array(&$this->Model3, 'behaviorMethod'),
+ *     'messages'          => array(
+ *       'invalid' => __('your input was wrong.', true),
+ *       'prev'    => __('wrong transition.', true),
+ *     ),
+ *   )
  * );
  *
  * @var mixed array or false
@@ -58,7 +58,7 @@ class TransitionComponent extends Object {
 /**
  * Messages set with Session::setFlash().
  * "invalid" key , When it cannot pass validation.
- * "prev"	 key , When session has no data for previous action.
+ * "prev"    key , When session has no data for previous action.
  *
  * @var array default messages with key
  * @access public
@@ -68,13 +68,17 @@ class TransitionComponent extends Object {
 /**
  * Parametors set with Session::setFlash().
  * "element" key Element to wrap flash message in.
- * "params"	 key , Parameters to be sent to layout as view variables.
- * "key"	 key , Message key, default is 'flash'.
+ * "params"  key , Parameters to be sent to layout as view variables.
+ * "key"     key , Message key, default is 'flash'.
  *
  * @var array default messages with key
  * @access public
  */
-	var $flashParams = array();
+	var $flashParams = array(
+		'element' => 'default',
+		'params' => array(),
+		'key' => 'flash',
+	);
 
 /**
  * Turns on or off auto loading session data to Controller::data.
@@ -143,12 +147,7 @@ class TransitionComponent extends Object {
 		// set default
 		$this->messages = array(
 			'invalid' => __('Input Data was not able to pass varidation. Please, try again.', true),
-			'prev'	  => __('Session timed out.', true),
-		);
-		$this->flashParams = array(
-			'element' => 'default',
-			'params' => array(),
-			'key' => 'flash',
+			'prev'    => __('Session timed out.', true),
 		);
 		// configure.
 		$this->_set($settings);
@@ -173,11 +172,11 @@ class TransitionComponent extends Object {
 			if ($doAutomate) {
 				$automation = $this->automation[$this->action];
 				$defaults = array(
-					'nextStep'		   => null,
-					'models'		   => $this->models,
-					'prev'			   => null,
+					'nextStep'         => null,
+					'models'           => $this->models,
+					'prev'             => null,
 					'validationMethod' => $this->validationMethod,
-					'messages'		   => $this->messages,
+					'messages'         => $this->messages,
 				);
 				$automation = array_merge($defaults, $automation);
 				extract($automation);
@@ -252,7 +251,7 @@ class TransitionComponent extends Object {
 	}
 
 /**
- * Check data of current controller with auto validation , auto redirection , auto setFlash() ,	 and auto restoring data
+ * Checking data of current controller with auto validation , auto redirection , auto setFlash() , and auto restoring data
  *
  * @param mixed $nextStep Next step url (will be passed to Controller::redirect())
  * @param mixed $models Models for validation
@@ -436,7 +435,7 @@ class TransitionComponent extends Object {
 /**
  * Get merged session data.
  *
- * @param string $callback Callback method to merging. valid callback type or Sring like "Set::merge" can be accepted.
+ * @param string $callback Callback method to merging. valid callback type or Sring like "Set::merge" can be accepted.(optional)
  * @return mixed Merged session data or null
  * @access public
  */
@@ -467,7 +466,7 @@ class TransitionComponent extends Object {
  * @access public
  */
 	function sessionKey($key, $cname = null) {
-		$key   = $key	=== null ? "" : ".$key";
+		$key   = $key   === null ? "" : ".$key";
 		$cname = $cname === null ? "." . $this->_controller->name : ".$cname";
 		return $this->sessionBaseKey . $cname . $key;
 	}
