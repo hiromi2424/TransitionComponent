@@ -36,6 +36,8 @@ In controller's property section:
 
 ## Sample ##
 
+1. Simple Wizard Form
+
 	class UsersController extends AppController{
 		var $components = array('Transition');
 		// base of user information
@@ -80,5 +82,31 @@ In controller's property section:
 				$this->Session->setFlash(__('Registration failed ...', true));
 				$this->redirect(array('action' => 'register'));
 			}
+		}
+	}
+
+
+2. Transition among two Controllers
+
+	class FirstController extends AppContoller {
+		var $components = array('Transition');
+		function one() {
+			$this->Transition->checkData(array('controller' => 'second', 'action' => 'two'));
+		}
+		function three() {
+			$this->Transition->checkPrev(array(
+				'one',
+				array('controller' => 'second', 'action' => 'two')
+			));
+		}
+	}
+	class SecondController extends AppContoller {
+		var $components = array('Transition');
+		function two() {
+			$this->Transition->automate(
+				array('controller' => 'first', 'action' => 'three'),
+				null,
+				array('controller' => 'first', 'action' => 'one')
+			);
 		}
 	}

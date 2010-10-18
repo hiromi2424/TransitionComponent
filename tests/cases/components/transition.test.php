@@ -190,6 +190,20 @@ class TransitionComponentTest extends CakeTestCase {
 
 		$t->checkPrev('unknown', null, 'index');
 		$this->assertEqual($c->redirectTo, '/index');
+
+		$t->setData('current_controller', 'dummy');
+		$t->setData('current_controller2', 'dummy');
+		$t->setData(array('controller' => 'others', 'action' => 'other_controller'), 'dummy');
+
+		$toCheck = array(
+			'current_controller',
+			'current_controller2',
+			array('controller' => 'others', 'action' => 'other_controller'),
+		);
+		$this->assertTrue($t->checkPrev($toCheck));
+		$toCheck[1] = 'not_exists';
+		$this->assertFalse($t->checkPrev($toCheck));
+		$this->assertEqual($c->redirectTo, '/not_exists');
 	}
 
 	function testCheckData() {
