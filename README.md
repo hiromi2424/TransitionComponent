@@ -2,7 +2,7 @@
 
 ## Version ##
 
-This was versioned as 1.0 stable.
+This was versioned as 1.1 alpha.
 
 ## Introduction ##
 
