@@ -154,7 +154,7 @@ class TransitionComponent extends Object {
 	function initialize(&$controller,$settings = array()) {
 		// set default
 		$this->messages = array(
-			'invalid' => __('Input Data was not able to pass varidation. Please, try again.', true),
+			'invalid' => __('Input Data was not able to pass validation. Please, try again.', true),
 			'prev'    => __('Session timed out.', true),
 		);
 		// configure.
@@ -345,7 +345,7 @@ class TransitionComponent extends Object {
 				isset($c->{$controllerModel}->{$modelName})
 			;
 			if ($controllerHasModel) {
-				if( isset($c->{$controllerModel}->{$modelName})) {
+				if(isset($c->{$controllerModel}->{$modelName})) {
 					$model =& $c->{$controllerModel}->{$modelName};
 				} else {
 					$model =& $c->{$modelName};
