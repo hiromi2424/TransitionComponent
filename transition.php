@@ -345,7 +345,7 @@ class TransitionComponent extends Object {
 				isset($c->{$controllerModel}->{$modelName})
 			;
 			if ($controllerHasModel) {
-				if(isset($c->{$controllerModel}->{$modelName})) {
+				if (isset($c->{$controllerModel}->{$modelName})) {
 					$model =& $c->{$controllerModel}->{$modelName};
 				} else {
 					$model =& $c->{$modelName};
