@@ -48,7 +48,7 @@ In controller's property section:
 			$this->Transition->automate(
 				'register_confirm', // next action
 				'Enquete', // model name to validate
-				'register_confirm' // previous action to check
+				'register' // previous action to check
 			);
 		}
 		// confirm inputs
