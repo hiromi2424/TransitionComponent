@@ -517,7 +517,7 @@ class TransitionComponent extends Component {
  * @access public
  */
 	public function allData() {
-		return $this->data(null);
+		return $this->Session->read($this->sessionBaseKey);
 	}
 
 /**
@@ -540,8 +540,10 @@ class TransitionComponent extends Component {
 		}
 
 		$merged = array();
-		foreach ($allData as $action => $data) {
-			$merged = call_user_func($callback, $merged, $data);
+		foreach ($allData as $controller => $actions) {
+			foreach ($actions as $action => $data) {
+				$merged = call_user_func($callback, $merged, $data);
+			}
 		}
 
 		return $merged;
@@ -551,8 +553,8 @@ class TransitionComponent extends Component {
 /**
  * Get Session key.
  *
- * @param string $key Key name
- * @param string $cname controller name(deprecated argument)
+ * @param string $key Key name or url parameter array
+ * @param string $cname controller name(optional)
  * @return string Session key
  * @access public
  */

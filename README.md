@@ -10,7 +10,6 @@ Transition component is a CakePHP component to help your transitional pages logi
 
 - For instance, this bears most wizard parts.
 - In almost every case, your method for action can be one-liner as like following codes:
-
 		public function action(){
 			$this->Transition->automate('previous_action', 'next_action');
 		}
@@ -30,10 +29,6 @@ Or:
 	cd /path/to/your_repository
 	git submodule add git://github.com/hiromi2424/TransitionComponent.git plugins/transition
 
-
-In controller's property section:
-	public $components = array( ... , 'Transition.Transition');
-
 ## Summary ##
 
 - checkData() is to check data(if given) with model validation and auto redirecting
@@ -42,64 +37,104 @@ In controller's property section:
 
 ## Sample ##
 
-	class UsersController extends AppController{
+1. Simple Wizard Form
 
-		public $components = array('Transition');
+		class UsersController extends AppController{
 
-		// base of user information
-		public function register() {
-			// give a next action name
-			$this->Transition->checkData('register_enquete');
-		}
+			public $components = array('Transition.Transition');
 
-		// input enquete
-		public function register_enquete() {
+			// base of user information
+			public function register() {
 
-			$this->Transition->automate(
-				'register', // previous action to check
-				'register_confirm', // next action
-				'Enquete' // model name to validate
-			);
+				// give a next action name
+				$this->Transition->checkData('register_enquete');
 
-		}
+			}
 
-		// confirm inputs
-		public function register_confirm() {
+			// input enquete
+			public function register_enquete() {
 
-			$this->Transition->automate(
-				'register_enquete', // prev
-				'register_save', // next
+				$this->Transition->automate(
+					'register_confirm', // previous action to check
+					'register_confirm', // next action
+					'Enquete' // model name to validate
+				);
+
+			}
+
+			// confirm inputs
+
+			public function register_confirm() {
+				$this->Transition->automate(
+					'register_enquete', // prev
+					'register_save', // next
 				array(
 					'validationMethod' => 'validateCaptcha', // virtual function to validate with captcha
 				)
-			 );
+				 );
 
-			$this->set('data', $this->Transition->allData());
-			$this->set('captcha', createCaptcha()); // virtual function to create a captcha
+				$this->set('data', $this->Transition->allData());
+				$this->set('captcha', createCaptcha()); // virtual function to create a captcha
 
-		}
+			}
 
-		// stroring inputs
-		public function register_save() {
+			// stroring inputs
+			public function register_save() {
 
-			// As like this, multi action name can be accepted
-			$this->Transition->checkPrev(array(
-				'register',
-				'register_enquete',
-				'register_confirm'
-			));
+				// As like this, multi action name can be accepted
+				$this->Transition->checkPrev(array(
+					'register',
+					'register_enquete',
+					'register_confirm'
+				));
 
-			// mergedData() returns all session data saved on the actions merged
-			if ($this->User->saveAll($this->Transition->mergedData()) {
-				// Clear all of session data TransitionComponent uses
-				$this->Transition->clearData();
-				$this->Session->setFlash(__('Registration complete !!', true));
-				$this->redirect(array('action' => 'index'));
-			} else {
-				$this->Session->setFlash(__('Registration failed ...', true));
-				$this->redirect(array('action' => 'register'));
+				// mergedData() returns all session data saved on the actions merged
+				if ($this->User->saveAll($this->Transition->mergedData()) {
+
+					// Clear all of session data TransitionComponent uses
+					$this->Transition->clearData();
+					$this->Session->setFlash(__('Registration complete !!', true));
+					$this->redirect(array('action' => 'index'));
+
+				} else {
+
+					$this->Session->setFlash(__('Registration failed ...', true));
+					$this->redirect(array('action' => 'register'));
+
+				}
+
 			}
 
 		}
 
-	}
+
+2. Transition among two Controllers
+
+		class FirstController extends AppContoller {
+
+			public $components = array('Transition.Transition');
+
+			public function one() {
+				$this->Transition->checkData(array('controller' => 'second', 'action' => 'two'));
+			}
+
+			public function three() {
+				$this->Transition->checkPrev(array(
+					'one',
+					array('controller' => 'second', 'action' => 'two')
+				));
+			}
+
+		}
+
+		class SecondController extends AppContoller {
+
+			public $components = array('Transition.Transition');
+
+			public function two() {
+				$this->Transition->automate(
+					array('controller' => 'first', 'action' => 'one'),
+					array('controller' => 'first', 'action' => 'three')
+				);
+			}
+		}

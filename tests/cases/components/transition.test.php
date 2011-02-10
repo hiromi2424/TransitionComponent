@@ -271,6 +271,20 @@ class TransitionComponentTest extends CakeTestCase {
 		$t->checkPrev('unknown', null, 'index');
 		$this->assertEqual($c->redirectTo, '/index');
 
+		$t->setData('current_controller', 'dummy');
+		$t->setData('current_controller2', 'dummy');
+		$t->setData(array('controller' => 'others', 'action' => 'other_controller'), 'dummy');
+
+		$toCheck = array(
+			'current_controller',
+			'current_controller2',
+			array('controller' => 'others', 'action' => 'other_controller'),
+		);
+		$this->assertTrue($t->checkPrev($toCheck));
+		$toCheck[1] = 'not_exists';
+		$this->assertFalse($t->checkPrev($toCheck));
+		$this->assertEqual($c->redirectTo, '/not_exists');
+
 	}
 
 	public function testCheckData() {
@@ -432,7 +446,7 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->assertEqual($s->read($this->sessionBaseKey . '.param1'), $expected);
 		$this->assertEqual($t->data('param1'), $expected);
 		$this->assertEqual($t->data('param2'), null);
-		$this->assertEqual($t->allData(), array('param1' => $expected));
+		$this->assertEqual($t->allData(), array('transition_component_test' => array('param1' => $expected)));
 
 		$this->assertTrue($t->setData('param2', array('User' => array('id' => 1, 'name' => 'user1', 'age' => 46))));
 		$this->assertTrue($t->setData('param3', array('User' => array('id' => 2, 'name' => 'user2'))));
