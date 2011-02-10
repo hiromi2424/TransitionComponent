@@ -2,13 +2,13 @@
 /**
  * TransitionComponent. Among form pages , auto validation and auto redirect.
  *
- * PHP versions 4 and 5 , CakePHP => 1.2
+ * PHP versions 5 , CakePHP => 2.0
  *
  * @copyright     Copyright 2010, hiromi
  * @package       cake
  * @subpackage    cake.app.controllers.components.transition
- * @version       1.0.1
- * @license       Free
+ * @version       Beta
+ * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
 
@@ -17,19 +17,18 @@
  * Among form pages , auto validation and auto redirect.
  * This will use Session.
  *
- * @package       cake
- * @subpackage    cake.app.controllers.components.transition
+ * @package       Transition
  */
 
-class TransitionComponent extends Object {
+class TransitionComponent extends Component {
 
 /**
  * Components to use.
  *
- * @var array name of components
+ * @public array name of components
  * @access public
  */
-	var $components = array('Session');
+	public $components = array('Session');
 
 /**
  * Turns on or off automation on startup.
@@ -50,20 +49,20 @@ class TransitionComponent extends Object {
  *   )
  * );
  *
- * @var mixed array or false
+ * @public mixed array or false
  * @access public
  */
-	var $automation = false;
+	public $automation = false;
 
 /**
  * Messages set with Session::setFlash().
  * "invalid" key , When it cannot pass validation.
  * "prev"    key , When session has no data for previous action.
  *
- * @var array default messages with key
+ * @public array default messages with key
  * @access public
  */
-	var $messages = array();
+	public $messages = array();
 
 /**
  * Parametors set with Session::setFlash().
@@ -71,10 +70,10 @@ class TransitionComponent extends Object {
  * "params"  key , Parameters to be sent to layout as view variables.
  * "key"     key , Message key, default is 'flash'.
  *
- * @var array default messages with key
+ * @public array default messages with key
  * @access public
  */
-	var $flashParams = array(
+	public $flashParams = array(
 		'element' => 'default',
 		'params' => array(),
 		'key' => 'flash',
@@ -83,94 +82,101 @@ class TransitionComponent extends Object {
 /**
  * Turns on or off auto loading session data to Controller::data.
  *
- * @var boolean auto loading data
+ * @public boolean auto loading data
  * @access public
  */
-	var $autoComplete = true;
+	public $autoComplete = true;
 
 /**
  * Turns on or off auto redirect when data passes validation or session data of previous action is empty.
  *
- * @var boolean auto redirection
+ * @public boolean auto redirection
  * @access public
  */
-	var $autoRedirect = true;
+	public $autoRedirect = true;
 
 /**
  * Default models.
  *
- * @var array models
+ * @public array models
  * @access public
  */
-	var $models = null;
+	public $models = null;
 
 /**
  * Default validation method.
  *
- * @var callback validation method
+ * @public callback validation method
  * @access public
  */
-	var $validationMethod = null;
+	public $validationMethod = null;
 
 /**
  * Holds the reference of current controller
  *
- * @var object controller
+ * @public object controller
  * @access private
  */
-	var $_controller;
-/**
- * Holds the current action of the controller
- *
- * @var string action name
- * @access private
- */
-	var $action;
+	public $Controller;
+
 /**
  * Base of session key
  *
- * @var string session base name
+ * @public string session base name
  * @access public
  */
-	var $sessionBaseKey = 'Transition';
+	public $sessionBaseKey = 'Transition';
+
+/**
+ * Inflection method for controller name. 
+ * if controller name was detected from current controller, this method was applied to controller name.
+ *
+ * @var string method name for Inflector
+ * @access public
+ */
+	public $controllerInflection = 'underscore';
 
 
 /**
- * Initialize the TransitionComponent
+ * Constructor
  *
- * @param object $controller Controller instance for the request
+ * @param ComponentCollection $collection instance for the ComponentCollection
  * @param array $settings Settings to set to the component
  * @return void
  * @access public
  */
-	function initialize(&$controller,$settings = array()) {
+	public function __construct(ComponentCollection $collection, $settings = array()) {
+
 		// set default
 		$this->messages = array(
-			'invalid' => __('Input Data was not able to pass validation. Please, try again.', true),
-			'prev'    => __('Session timed out.', true),
+			'invalid' => __d('transition', 'Input Data was not able to pass validation. Please, try again.', true),
+			'prev'    => __d('transition', 'Session timed out.', true),
 		);
 		// configure.
 		$this->_set($settings);
-		$this->_controller =& $controller;
-		$this->action = $controller->params['action'];
+		$this->Controller = $collection->getController();
+
+		parent::__construct($collection, $settings);
+
 	}
+
 
 /**
  * Component startup. Given automation options , It will automate.
  *
- * @param object $controller Instantiating controller
+ * @param object $Controller Instantiating controller
  * @return void
  * @access public
  */
-	function startup(&$controller) {
+	public function startup($Controller) {
 		if ($this->automation !== false) {
 			$doAutomate =
 				is_array($this->automation) &&
-				array_key_exists($this->action, $this->automation)
+				array_key_exists($this->Controller->request->action, $this->automation)
 			;
 
 			if ($doAutomate) {
-				$automation = $this->automation[$this->action];
+				$automation = $this->automation[$this->Controller->request->action];
 				$defaults = array(
 					'nextStep'         => null,
 					'models'           => $this->models,
@@ -179,75 +185,143 @@ class TransitionComponent extends Object {
 					'messages'         => $this->messages,
 				);
 				$automation = array_merge($defaults, $automation);
-				extract($automation);
-				return $this->automate($nextStep, $models, $prev, $validationMethod, $messages);
+
+				return $this->automate($automation['prev'], $automation['nextStep'], $automation);
+
 			}
 		}
+
 		return true;
+
+	}
+
+/**
+ * filters null.
+ *
+ * @param array $params parameters to be filtered
+ * @return array filtered paramteres
+ * @access protected
+ */
+	protected function _filter($params) {
+
+		if (!is_array($params)) {
+			$params = (array)$params;
+		}
+
+		foreach ($params as $key => $value) {
+			if ($value === null) {
+				unset($params[$key]);
+			}
+		}
+
+		return $params;
+
 	}
 
 /**
  * Automation method.
  *
  * @param mixed $nextStep Next step url (will be given Controller::redirect())
- * @param mixed $models Models for validation
  * @param mixed $prev Previous action for check
- * @param callback $validationMethod Method to validate
- * @param array $messages Messages to Controller::setFlash()
+ * @param array $options automate options. only 'models', 'validationMethod' and 'messages' are expected.
  * @return boolean Success
  * @access public
  */
-	function automate($nextStep, $models = null, $prev = null, $validationMethod = null, $messages = array()) {
-		$c =& $this->_controller;
-		$messages = array_merge($this->messages, $messages);
+	public function automate($prev, $nextStep, $options = array(), $validationMethod = null, $messages = null) {
+
+		// mostly compatible
+		if (is_string($options)) {
+			$options = array('models' => $options);
+		} elseif ($options !== array() && empty($options)) {
+			$options = array();
+		}
+
+		$options += $this->_filter(compact('validationMethod', 'messages'));
+
+		$defaults = array(
+			'messages' => $this->messages,
+			'models' => $this->models,
+			'validationMethod' => $this->validationMethod,
+		);
+
+		extract($options = Set::merge($defaults, $options));
 
 		if ($prev !== null) {
-			if (!$this->checkPrev($prev, $messages['prev'])) {
+			$prevOption = array_merge($options, array('message' => $messages['prev']));
+			if (!$this->checkPrev($prev, $prevOption)) {
 				return false;
 			}
 		}
+
 		if ($nextStep !== null) {
-			if (!$this->checkData($nextStep, $models, $validationMethod, $messages['invalid'])) {
+			$nextOption = array_merge($options, array('message' => $messages['invalid']));
+			if (!$this->checkData($nextStep, $nextOption)) {
 				return false;
 			}
 		}
+
 		return true;
+
 	}
 
 /**
  * Check previous session data.
  *
  * @param mixed $prev Previous action for check
- * @param string $message A Message to Controller::setFlash()
+ * @param array $options 
  * @param string $prevAction Previous action to Redirect.
  * @return boolean Success
  * @access public
  */
-	function checkPrev($prev, $message = null, $prevAction = null) {
-		if (is_array($prev)) {
+	public function checkPrev($prev, $options = array(), $prevAction = null) {
+
+		// mostly compatible
+		if (is_string($options)) {
+			$options = array('message' => $options);
+		} elseif ($options !== array() && empty($options)) {
+			$options = array();
+		}
+		$options += $this->_filter(compact('prevAction'));
+
+		$defaults = array(
+			'message' => $this->messages['prev'],
+		);
+		extract($options = array_merge($defaults, $options));
+
+		if (is_array($prev) && Set::numeric(array_keys($prev))) {
+
 			foreach ($prev as $p) {
-				if (!$this->checkPrev($p, $message, $prevAction)) {
+				if (!$this->checkPrev($p, $options)) {
 					return false;
 				}
 			}
+
 			return true;
+
 		}
+
+		$check = true;
+
 		if ($prevAction === null) {
 			$prevAction = array('action' => $prev);
 		}
-		if ($message === null) {
-			$message = $this->messages['prev'];
-		}
+
 		if (!$this->Session->check($this->sessionKey($prev))) {
+
 			if ($message !== false) {
 				$this->Session->setFlash($message, $this->flashParams['element'], $this->flashParams['params'], $this->flashParams['key']);
 			}
+
 			if ($this->autoRedirect) {
-				$this->_controller->redirect($prevAction);
+				$this->Controller->redirect($prevAction);
 			}
+
 			return false;
+
 		}
+
 		return true;
+
 	}
 
 /**
@@ -256,23 +330,31 @@ class TransitionComponent extends Object {
  * @param mixed $nextStep Next step url (will be passed to Controller::redirect())
  * @param mixed $models Models for validation
  * @param callback $validationMethod Method to validate
- * @param array $messages Messages to Controller::setFlash()
+ * @param string $messages Messages to Controller::setFlash()
  * @param string $sessionKey Session key to store
  * @return boolean Success
  * @access public
  */
-	function checkData($nextStep = null, $models = null, $validationMethod = null, $message = null, $sessionKey = null) {
-		$models = $this->_autoLoadModels($models);
-		$c =& $this->_controller;
-		if ($sessionKey === null) {
-			$sessionKey = $this->action;
-		}
+	public function checkData($nextStep = null, $options = array(), $validationMethod = null, $message = null, $sessionKey = null) {
 
-		if ($message === null) {
-			$message = $this->messages['invalid'];
+		if (!is_array($options)) {
+			$options = array('models' => $options);
 		}
-		if (!empty($c->data)) {
-			$this->setData($sessionKey, $c->data);
+		$options += $this->_filter(compact('validationMethod', 'message', 'sessionKey'));
+
+		$defaults = array(
+			'message' => $this->messages['invalid'],
+			'models' => $this->models,
+			'validationMethod' => $this->validationMethod,
+			'sessionKey' => $this->Controller->request->action,
+		);
+		extract($options = array_merge($defaults, $options));
+
+		$models = $this->autoLoadModels($models);
+
+		if ($this->Controller->request->is('post') || $this->Controller->request->is('put')) {
+
+			$this->setData($sessionKey, (array)$this->Controller->request->data);
 
 			if (is_array($models)) {
 				$result = true;
@@ -288,7 +370,7 @@ class TransitionComponent extends Object {
 			if ($result) {
 				if ($nextStep !== null && $this->autoRedirect) {
 					$nextStep = !is_array($nextStep) ? array('action' => $nextStep) : $nextStep;
-					$c->redirect($nextStep);
+					$this->Controller->redirect($nextStep);
 				}
 			} else {
 				if ($message !== false) {
@@ -297,7 +379,7 @@ class TransitionComponent extends Object {
 				return false;
 			}
 		} elseif ($this->autoComplete && $this->Session->check($this->sessionKey($sessionKey))) {
-			$c->data = $this->data($sessionKey);
+			$this->Controller->request->data = $this->data($sessionKey);
 		}
 
 		return true;
@@ -306,41 +388,34 @@ class TransitionComponent extends Object {
 /**
  * Validation with model name.
  *
- * @param mixed $models Models for validation
+ * @param mixed $model Model for validation
  * @param callback $validationMethod Method to validate
  * @return boolean Success
  * @access public
  */
-	function validateModel($model, $validationMethod = null) {
+	public function validateModel($model, $validationMethod = null) {
+
 		if ($validationMethod === null) {
 			$validationMethod = $this->validationMethod;
 		}
-
-		$c =& $this->_controller;
 
 		/**
 		 * Loading Model object.
 		 */
 		if (!is_object($model) && $model !== null) {
-			$controllerModel = $c->modelClass;
+
 			$modelName = Inflector::classify($model);
 
-			$controllerHasModel =
-				isset($c->{$modelName}) ||
-				isset($c->{$controllerModel}->{$modelName})
-			;
-			if ($controllerHasModel) {
-				if (isset($c->{$controllerModel}->{$modelName})) {
-					$model =& $c->{$controllerModel}->{$modelName};
-				} else {
-					$model =& $c->{$modelName};
-				}
+			if (isset($this->Controller->{$modelName})) {
+				$model = $this->Controller->{$modelName};
+			} elseif (isset($this->Controller->{$this->Controller->modelClass}->{$modelName})) {
+				$model = $this->Controller->{$this->Controller->modelClass}->{$modelName};
 			} else {
-				$model =& ClassRegistry::init($modelName);
+				$model = ClassRegistry::init($modelName);
 			}
+
 		}
 
-		$data = $c->data;
 		$result = true;
 
 		// User method.
@@ -352,14 +427,14 @@ class TransitionComponent extends Object {
 			;
 
 			if ($isModelMethod || $model === null) {
-				$result = call_user_func($validationMethod, $data);
+				$result = call_user_func($validationMethod, $this->Controller->request->data);
 			} else {
-				$result = call_user_func($validationMethod, $model, $data);
+				$result = call_user_func($validationMethod, $model, $this->Controller->request->data);
 			}
 		}
 
-		if (!empty($data) && is_object($model)) {
-			$model->set($data);
+		if (!empty($this->Controller->request->data) && is_object($model)) {
+			$model->set($this->Controller->request->data);
 			if (!$model->validates()) {
 				$result = false;
 			}
@@ -376,15 +451,19 @@ class TransitionComponent extends Object {
  * @return mixed Session data or null
  * @access protected
  */
-	function _autoLoadModels($models) {
+	public function autoLoadModels($models) {
+
 		if ($models === null) {
+
 			if (!empty($this->models)) {
 				return $this->models;
 			}
-			$c =& $this->_controller;
+
+			$c = $this->Controller;
 			if ($c->modelClass !== null && $c->{$c->modelClass}) {
 				$models = $c->modelClass;
 			}
+
 		} elseif ($models === false) {
 			$models = null;
 		}
@@ -392,7 +471,9 @@ class TransitionComponent extends Object {
 		if ($models !== null && !is_array($models)) {
 			$models = array($models);
 		}
+
 		return $this->models = $models;
+
 	}
 
 /**
@@ -402,12 +483,19 @@ class TransitionComponent extends Object {
  * @return mixed Session data or null
  * @access public
  */
-	function data($key) {
+	public function data($key, $data = null) {
+
+		if ($data !== null) {
+			$this->setData($key, $data);
+		}
+
 		$key = $this->sessionKey($key);
 		if ($this->Session->check($key)) {
 			return $this->Session->read($key);
 		}
+
 		return null;
+
 	}
 
 /**
@@ -418,7 +506,7 @@ class TransitionComponent extends Object {
  * @return boolean Success
  * @access public
  */
-	function setData($key, $data) {
+	public function setData($key, $data) {
 		return $this->Session->write($this->sessionKey($key), $data);
 	}
 
@@ -428,7 +516,7 @@ class TransitionComponent extends Object {
  * @return mixed Session data or null
  * @access public
  */
-	function allData() {
+	public function allData() {
 		return $this->data(null);
 	}
 
@@ -439,11 +527,13 @@ class TransitionComponent extends Object {
  * @return mixed Merged session data or null
  * @access public
  */
-	function mergedData($callback = 'Set::merge') {
+	public function mergedData($callback = 'Set::merge') {
+
 		$allData = $this->allData();
 		if (empty($allData)) {
 			return $allData;
 		}
+
 		if(!is_array($callback)) {
 			@list($class, $func) = explode('::', $callback);
 			$callback = !empty($func) ? array($class, $func) : $class;
@@ -455,6 +545,7 @@ class TransitionComponent extends Object {
 		}
 
 		return $merged;
+
 	}
 
 /**
@@ -465,10 +556,30 @@ class TransitionComponent extends Object {
  * @return string Session key
  * @access public
  */
-	function sessionKey($key, $cname = null) {
-		$key   = $key   === null ? "" : ".$key";
-		$cname = $cname === null ? "." . $this->_controller->name : ".$cname";
+	public function sessionKey($key, $cname = null) {
+
+		if (is_array($key) && isset($key['controller'])) {
+			$cname = $key['controller'];
+		}
+
+		if (is_array($key)) {
+			if (isset($key['action'])) {
+				$key = $key['action'];
+			} else {
+				$key = null;
+			}
+		}
+
+		$key = $key === null ? "" : ".$key";
+		if ($cname === null) {
+			$method = $this->controllerInflection;
+			$cname = '.' . Inflector::$method($this->Controller->name);
+		} else {
+			$cname = ".$cname";
+		}
+
 		return $this->sessionBaseKey . $cname . $key;
+
 	}
 
 /**
@@ -478,9 +589,11 @@ class TransitionComponent extends Object {
  * @return boolean Success
  * @access public
  */
-	function deleteData($key) {
+	public function deleteData($key) {
+
 		$key = $this->sessionKey($key);
 		return $this->Session->delete($key);
+
 	}
 
 /**
@@ -490,7 +603,7 @@ class TransitionComponent extends Object {
  * @return boolean Success
  * @access public
  */
-	function delData($key) {
+	public function delData($key) {
 		return $this->deleteData($key);
 	}
 
@@ -501,11 +614,14 @@ class TransitionComponent extends Object {
  * @return boolean Success
  * @access public
  */
-	function clearData() {
+	public function clearData() {
+
 		if ($this->Session->check($this->sessionBaseKey)) {
 			return $this->Session->delete($this->sessionBaseKey);
 		}
+
 		return true;
+
 	}
 
 }
