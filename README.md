@@ -55,7 +55,7 @@ Or:
 			public function register_enquete() {
 
 				$this->Transition->automate(
-					'register_confirm', // previous action to check
+					'register', // previous action to check
 					'register_confirm', // next action
 					'Enquete' // model name to validate
 				);
@@ -63,14 +63,14 @@ Or:
 			}
 
 			// confirm inputs
-
 			public function register_confirm() {
+
 				$this->Transition->automate(
 					'register_enquete', // prev
 					'register_save', // next
-				array(
-					'validationMethod' => 'validateCaptcha', // virtual function to validate with captcha
-				)
+					array(
+						'validationMethod' => 'validateCaptcha', // virtual function to validate with captcha
+					)
 				 );
 
 				$this->set('data', $this->Transition->allData());
