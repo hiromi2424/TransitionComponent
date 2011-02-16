@@ -319,6 +319,21 @@ class TransitionComponent extends Object {
 	}
 
 /**
+ * Set session data with key, and redirect
+ *
+ * @param mixed $url A string or array-based URL pointing to another location within the app,
+ *	   or an absolute URL
+ * @param integer $status Optional HTTP status code (eg: 404)
+ * @param boolean $exit If true, exit() will be called after the redirect
+ */
+	function redirect ($url, $status = null, $exit = true) {
+		$c =& $this->_controller;
+		$sessionKey = $this->action;
+		$this->setData($sessionKey, array());
+		$c->redirect($url, $status, $exit);
+	}
+
+/**
  * Validation with model name.
  *
  * @param mixed $models Models for validation
