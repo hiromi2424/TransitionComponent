@@ -25,8 +25,7 @@ class TransitionComponent extends Component {
 /**
  * Components to use.
  *
- * @public array name of components
- * @access public
+ * @var array name of components
  */
 	public $components = array('Session');
 
@@ -49,8 +48,7 @@ class TransitionComponent extends Component {
  *   )
  * );
  *
- * @public mixed array or false
- * @access public
+ * @var mixed array or false
  */
 	public $automation = false;
 
@@ -59,8 +57,7 @@ class TransitionComponent extends Component {
  * "invalid" key , When it cannot pass validation.
  * "prev"    key , When session has no data for previous action.
  *
- * @public array default messages with key
- * @access public
+ * @var array default messages with key
  */
 	public $messages = array();
 
@@ -70,8 +67,7 @@ class TransitionComponent extends Component {
  * "params"  key , Parameters to be sent to layout as view variables.
  * "key"     key , Message key, default is 'flash'.
  *
- * @public array default messages with key
- * @access public
+ * @var array default messages with key
  */
 	public $flashParams = array(
 		'element' => 'default',
@@ -82,48 +78,42 @@ class TransitionComponent extends Component {
 /**
  * Turns on or off auto loading session data to Controller::data.
  *
- * @public boolean auto loading data
- * @access public
+ * @var boolean auto loading data
  */
 	public $autoComplete = true;
 
 /**
  * Turns on or off auto redirect when data passes validation or session data of previous action is empty.
  *
- * @public boolean auto redirection
- * @access public
+ * @var boolean auto redirection
  */
 	public $autoRedirect = true;
 
 /**
  * Default models.
  *
- * @public array models
- * @access public
+ * @var array models
  */
 	public $models = null;
 
 /**
  * Default validation method.
  *
- * @public callback validation method
- * @access public
+ * @var callback validation method
  */
 	public $validationMethod = null;
 
 /**
  * Holds the reference of current controller
  *
- * @public object controller
- * @access private
+ * @var object controller
  */
 	public $Controller;
 
 /**
  * Base of session key
  *
- * @public string session base name
- * @access public
+ * @var string session base name
  */
 	public $sessionBaseKey = 'Transition';
 
@@ -132,7 +122,6 @@ class TransitionComponent extends Component {
  * if controller name was detected from current controller, this method was applied to controller name.
  *
  * @var string method name for Inflector
- * @access public
  */
 	public $controllerInflection = 'underscore';
 
@@ -142,7 +131,6 @@ class TransitionComponent extends Component {
  * @param ComponentCollection $collection instance for the ComponentCollection
  * @param array $settings Settings to set to the component
  * @return void
- * @access public
  */
 	public function __construct(ComponentCollection $collection, $settings = array()) {
 
@@ -165,7 +153,6 @@ class TransitionComponent extends Component {
  *
  * @param object $Controller Instantiating controller
  * @return void
- * @access public
  */
 	public function startup($Controller) {
 		if ($this->automation !== false) {
@@ -199,7 +186,6 @@ class TransitionComponent extends Component {
  *
  * @param array $params parameters to be filtered
  * @return array filtered paramteres
- * @access protected
  */
 	protected function _filter($params) {
 
@@ -224,7 +210,6 @@ class TransitionComponent extends Component {
  * @param mixed $prev Previous action for check
  * @param array $options automate options. only 'models', 'validationMethod' and 'messages' are expected.
  * @return boolean Success
- * @access public
  */
 	public function automate($prev, $nextStep, $options = array(), $validationMethod = null, $messages = null) {
 
@@ -270,7 +255,6 @@ class TransitionComponent extends Component {
  * @param array $options 
  * @param string $prevAction Previous action to Redirect.
  * @return boolean Success
- * @access public
  */
 	public function checkPrev($prev, $options = array(), $prevAction = null) {
 
@@ -336,7 +320,6 @@ class TransitionComponent extends Component {
  * @param string $messages Messages to Controller::setFlash()
  * @param string $sessionKey Session key to store
  * @return boolean Success
- * @access public
  */
 	public function checkData($nextStep = null, $options = array(), $validationMethod = null, $message = null, $sessionKey = null) {
 
@@ -411,7 +394,6 @@ class TransitionComponent extends Component {
  * @param mixed $model Model for validation
  * @param callback $validationMethod Method to validate
  * @return boolean Success
- * @access public
  */
 	public function validateModel($model, $validationMethod = null) {
 
@@ -469,7 +451,6 @@ class TransitionComponent extends Component {
  *
  * @param mixed $models a name or array of names
  * @return mixed Session data or null
- * @access protected
  */
 	public function autoLoadModels($models) {
 
@@ -501,7 +482,6 @@ class TransitionComponent extends Component {
  *
  * @param string $key Key name
  * @return mixed Session data or null
- * @access public
  */
 	public function data($key, $data = null) {
 
@@ -524,7 +504,6 @@ class TransitionComponent extends Component {
  * @param string $key Key name
  * @param mixed $data data to set
  * @return boolean Success
- * @access public
  */
 	public function setData($key, $data) {
 		return $this->Session->write($this->sessionKey($key), $data);
@@ -534,7 +513,6 @@ class TransitionComponent extends Component {
  * Get all of session data.
  *
  * @return mixed Session data or null
- * @access public
  */
 	public function allData() {
 		return $this->Session->read($this->sessionBaseKey);
@@ -545,7 +523,6 @@ class TransitionComponent extends Component {
  *
  * @param string $callback Callback method to merging. valid callback type or Sring like "Set::merge" can be accepted.(optional)
  * @return mixed Merged session data or null
- * @access public
  */
 	public function mergedData($callback = 'Set::merge') {
 
@@ -576,7 +553,6 @@ class TransitionComponent extends Component {
  * @param mixed $key Key name or url parameter array
  * @param string $cname controller name(optional)
  * @return string Session key
- * @access public
  */
 	public function sessionKey($key, $cname = null) {
 
@@ -609,7 +585,6 @@ class TransitionComponent extends Component {
  *
  * @param string $key Key name
  * @return boolean Success
- * @access public
  */
 	public function deleteData($key) {
 
@@ -623,7 +598,6 @@ class TransitionComponent extends Component {
  *
  * @param string $key Key name
  * @return boolean Success
- * @access public
  */
 	public function delData($key) {
 		return $this->deleteData($key);
@@ -634,7 +608,6 @@ class TransitionComponent extends Component {
  *
  * @param string $key Key name
  * @return boolean Success
- * @access public
  */
 	public function clearData() {
 
