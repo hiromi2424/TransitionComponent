@@ -278,7 +278,6 @@ class TransitionComponent extends Object {
  */
 	function checkData($nextStep = null, $models = null, $validationMethod = null, $message = null, $sessionKey = null) {
 		$models = $this->_autoLoadModels($models);
-		$c =& $this->_controller;
 		if ($sessionKey === null) {
 			$sessionKey = $this->action;
 		}
@@ -286,8 +285,8 @@ class TransitionComponent extends Object {
 		if ($message === null) {
 			$message = $this->messages['invalid'];
 		}
-		if (!empty($c->data)) {
-			$this->setData($sessionKey, $c->data);
+		if (!empty($this->_controller->data)) {
+			$this->setData($sessionKey, $this->_controller->data);
 
 			if (is_array($models)) {
 				$result = true;
@@ -303,7 +302,7 @@ class TransitionComponent extends Object {
 			if ($result) {
 				if ($nextStep !== null && $this->autoRedirect) {
 					$nextStep = !is_array($nextStep) ? array('action' => $nextStep) : $nextStep;
-					$c->redirect($nextStep);
+					$this->_controller->redirect($nextStep);
 				}
 			} else {
 				if ($message !== false) {
@@ -312,7 +311,7 @@ class TransitionComponent extends Object {
 				return false;
 			}
 		} elseif ($this->autoComplete && $this->Session->check($this->sessionKey($sessionKey))) {
-			$c->data = $this->data($sessionKey);
+			$this->_controller->data = $this->data($sessionKey);
 		}
 
 		return true;
@@ -327,10 +326,9 @@ class TransitionComponent extends Object {
  * @param boolean $exit If true, exit() will be called after the redirect
  */
 	function redirect ($url, $status = null, $exit = true) {
-		$c =& $this->_controller;
 		$sessionKey = $this->action;
 		$this->setData($sessionKey, array());
-		$c->redirect($url, $status, $exit);
+		$this->_controller->redirect($url, $status, $exit);
 	}
 
 /**
