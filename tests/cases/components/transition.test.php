@@ -243,6 +243,34 @@ class TransitionComponentTest extends CakeTestCase {
 
 	}
 
+	function testRedirect() {
+		$this->__loadController(array('action' => 'current_action'));
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$c->data = array();
+		$t->redirect(array('action' => 'next_action'));
+		$this->assertEqual($c->redirectTo, '/next_action');
+		$this->assertTrue($t->checkPrev(array('current_action')));
+
+		$this->Controller = null;
+		$this->__loadController(array('action' => 'next_action'));
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$c->data = array();
+		$t->redirect(array('action' => 'next_next_action'));
+		$this->assertEqual($c->redirectTo, '/next_next_action');
+		$this->assertTrue($t->checkPrev(array('current_action', 'next_action')));
+
+		$this->Controller = null;
+		$this->__loadController(array('action' => 'next_next_action'));
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$c->data = array();
+		$t->redirect(array('action' => 'next_next_next_action'));
+		$this->assertEqual($c->redirectTo, '/next_next_next_action');
+		$this->assertTrue($t->checkPrev(array('current_action', 'next_action', 'next_next_action')));
+	}
+
 	function testValidateModel() {
 		$this->__loadController();
 		$c = $this->Controller;
