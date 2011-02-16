@@ -7,7 +7,7 @@
  * @copyright     Copyright 2010, hiromi
  * @package       cake
  * @subpackage    cake.app.controllers.components.transition
- * @version       Beta
+ * @version       2.0 Beta
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
@@ -135,7 +135,6 @@ class TransitionComponent extends Component {
  * @access public
  */
 	public $controllerInflection = 'underscore';
-
 
 /**
  * Constructor
@@ -302,8 +301,12 @@ class TransitionComponent extends Component {
 
 		$check = true;
 
+		if (!is_array($prev)) {
+			$prev = array('action' => $prev);
+		}
+
 		if ($prevAction === null) {
-			$prevAction = array('action' => $prev);
+			$prevAction = $prev;
 		}
 
 		if (!$this->Session->check($this->sessionKey($prev))) {
@@ -383,6 +386,23 @@ class TransitionComponent extends Component {
 		}
 
 		return true;
+
+	}
+
+/**
+ * Set session data with key, and redirect
+ *
+ * @param mixed $url A string or array-based URL pointing to another location within the app,
+ *	   or an absolute URL
+ * @param integer $status Optional HTTP status code (eg: 404)
+ * @param boolean $exit If true, exit() will be called after the redirect
+ */
+	public function redirect ($url, $status = null, $exit = true) {
+
+		$sessionKey = $this->Controller->action;
+		$this->setData($sessionKey, array());
+		$this->Controller->redirect($url, $status, $exit);
+
 	}
 
 /**
@@ -553,7 +573,7 @@ class TransitionComponent extends Component {
 /**
  * Get Session key.
  *
- * @param string $key Key name or url parameter array
+ * @param mixed $key Key name or url parameter array
  * @param string $cname controller name(optional)
  * @return string Session key
  * @access public

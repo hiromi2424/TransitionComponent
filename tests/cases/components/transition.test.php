@@ -55,10 +55,13 @@ class NormalValidation extends CakeTestModel {
 	public $validate = array('max25char' => array('rule' => array('maxLength', 25)));
 
 	public function triggerError($data) {
+
 		foreach ($data[$this->name] as $key => $val) {
 			$this->invalidate($key, $val);
 		}
+
 		return false;
+
 	}
 
 }
@@ -198,6 +201,7 @@ class TransitionComponentTest extends CakeTestCase {
 		$c = $this->Controller;
 		$t = $c->Transition;
 		$s = $t->Session;
+
 		$c->request->data = array('dummy');
 
 
@@ -212,10 +216,10 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->assertFalse($t->automate('prev_action', 'next_action', 'ValidationFail'));
 		$this->assertTrue($t->automate('prev_action', 'next_action', 'ValidationSuccess'));
 
-
 		$c->request->data = array('NormalValidation' => array('max25char' => 'this will be handled as invalid'));
 		$NormalValidation = ClassRegistry::init('NormalValidation');
 		$result = $t->automate('prev_action', 'next_action', 'ValidationSuccess', array($NormalValidation, 'triggerError'), array('invalid' => 'validation failed'));
+
 		$this->assertFalse($result);
 		$this->assertEqual($s->read('Message.flash.message'), 'validation failed');
 		$this->assertFalse(empty($NormalValidation->validationErrors));
@@ -324,6 +328,30 @@ class TransitionComponentTest extends CakeTestCase {
 		$t->checkData();
 		$this->assertEqual($c->request->data, 'test_data');
 
+	}
+
+	public function testRedirect() {
+
+		$this->__loadController(array('action' => 'current_action'));
+		$c = $this->Controller;
+		$t = $c->Transition;
+
+		$c->request->data = array();
+		$t->redirect(array('action' => 'next_action'));
+		$this->assertEqual($c->redirectTo, '/next_action');
+		$this->assertTrue($t->checkPrev(array('current_action')));
+
+		$c->action = 'next_action';
+		$c->request->data = array();
+		$t->redirect(array('action' => 'next_next_action'));
+		$this->assertEqual($c->redirectTo, '/next_next_action');
+		$this->assertTrue($t->checkPrev(array('current_action', 'next_action')));
+
+		$c->action = 'next_next_action';
+		$c->request->data = array();
+		$t->redirect(array('action' => 'next_next_next_action'));
+		$this->assertEqual($c->redirectTo, '/next_next_next_action');
+		$this->assertTrue($t->checkPrev(array('current_action', 'next_action', 'next_next_action')));
 	}
 
 	public function testValidateModel() {
