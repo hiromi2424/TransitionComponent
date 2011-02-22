@@ -406,4 +406,22 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->assertFalse($t->delData(null));
 		$this->assertFalse($t->deleteData('param2'));
 	}
+
+	function testChangeActionByController() {
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$s = $t->Session;
+
+		$c->params['action'] = 'mobile_index';
+		$c->Component->initialize($c);
+		$c->beforeFilter();
+		$c->params['action'] = 'index';
+		$c->Component->startup($c);
+		$c->data = 'dummy';
+		$t->checkData('next');
+		$check = $t->allData();
+		$this->assertEqual(array('index'), array_keys($check['transition_component_test']));
+		$this->assertNotEqual(array('mobile_index'), array_keys($check['transition_component_test']));
+	}
+
 }

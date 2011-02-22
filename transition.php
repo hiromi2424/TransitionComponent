@@ -160,7 +160,6 @@ class TransitionComponent extends Object {
 		// configure.
 		$this->_set($settings);
 		$this->_controller =& $controller;
-		$this->action = $controller->params['action'];
 	}
 
 /**
@@ -171,6 +170,8 @@ class TransitionComponent extends Object {
  * @access public
  */
 	function startup(&$controller) {
+		$this->action = $controller->params['action'];
+
 		if ($this->automation !== false) {
 			$doAutomate =
 				is_array($this->automation) &&
