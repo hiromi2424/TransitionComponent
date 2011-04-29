@@ -267,6 +267,19 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->assertTrue($t->checkPrev(array('current_action', 'next_action', 'next_next_action')));
 	}
 
+	function testSpecificSessionKey() {
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$s = $t->Session;
+
+		$t->autoRedirect = true;
+		$c->data = array('dummy' => true);
+		$this->assertTrue($t->checkData('redirectTo', false, null, null, 'specificSessionKey'));
+		$this->assertEqual($c->redirectTo, '/redirectTo');
+		$this->assertTrue($t->data('specificSessionKey'));
+		$this->assertTrue($t->checkPrev('specificSessionKey'));
+	}
+
 	function testValidateModel() {
 		$this->__loadController();
 		$c = $this->Controller;
