@@ -29,7 +29,7 @@ class TransitionComponent extends Object {
  * @var array name of components
  * @access public
  */
-	var $components = array('Session');
+	var $components = array('Session', 'RequestHandler');
 
 /**
  * Turns on or off automation on startup.
@@ -142,6 +142,15 @@ class TransitionComponent extends Object {
  * @access public
  */
 	var $controllerInflection = 'underscore';
+
+/**
+ * Indicates whether !empty($this->data) or RequestHandler->isPost().
+ * When your form was submitted, the request type must be POST but the data will empty if the form containing no input.
+ *
+ * @var boolean true when using RequestHandler, otherwise false.
+ * @access public
+ */
+	var $seeRequestType = false;
 
 /**
  * Initialize the TransitionComponent
@@ -286,7 +295,7 @@ class TransitionComponent extends Object {
 		if ($message === null) {
 			$message = $this->messages['invalid'];
 		}
-		if (!empty($this->_controller->data)) {
+		if (($this->seeRequestType && $this->RequestHandler->isPost()) || !empty($this->_controller->data)) {
 			$this->setData($sessionKey, $this->_controller->data);
 
 			if (is_array($models)) {

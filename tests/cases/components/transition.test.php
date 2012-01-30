@@ -1,11 +1,11 @@
 <?php
 
 App::import('Controller', array('Component', 'Controller'), false);
-App::import('Component', 'Transition');
+App::import('Component', 'Utilities.Transition');
 
 class TransitionComponentTestController extends Controller {
 	var $name = 'TransitionComponentTest';
-	var $components = array('Transition');
+	var $components = array('Utilities.Transition');
 	var $uses = array('TransitionModel');
 	
 	var $redirectTo = null;
@@ -435,6 +435,25 @@ class TransitionComponentTest extends CakeTestCase {
 		$check = $t->allData();
 		$this->assertEqual(array('index'), array_keys($check['transition_component_test']));
 		$this->assertNotEqual(array('mobile_index'), array_keys($check['transition_component_test']));
+	}
+
+	function testSeeRequestType() {
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$s = $t->Session;
+		$c->data = array();
+		$t->seeRequestType = true;
+
+		$c->redirectTo = null;
+		$this->assertTrue($t->checkData('next', false));
+		$this->assertEqual($c->redirectTo, null);
+
+		$backup = $_SERVER;
+		$_SERVER['REQUEST_METHOD'] = 'POST';
+		$this->assertTrue($t->checkData('next', false));
+		$this->assertEqual($c->redirectTo, '/next');
+		$_SERVER = $backup;
+
 	}
 
 }
