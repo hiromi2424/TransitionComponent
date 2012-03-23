@@ -295,9 +295,8 @@ class TransitionComponent extends Object {
 		if ($message === null) {
 			$message = $this->messages['invalid'];
 		}
-		if (($this->seeRequestType && $this->RequestHandler->isPost()) || !empty($this->_controller->data)) {
-			$this->setData($sessionKey, $this->_controller->data);
 
+		if (($this->seeRequestType && $this->RequestHandler->isPost()) || !empty($this->_controller->data)) {
 			if (is_array($models)) {
 				$result = true;
 				foreach ($models as $model) {
@@ -308,6 +307,8 @@ class TransitionComponent extends Object {
 			} else {
 				$result = $this->validateModel($models, $validationMethod);
 			}
+
+			$this->setData($sessionKey, $this->_controller->data);
 
 			if ($result) {
 				if ($nextStep !== null && $this->autoRedirect) {

@@ -14,6 +14,12 @@ class TransitionComponentTestController extends Controller {
 		$this->redirectTo = Router::url($url);
 		return true;
 	}
+
+	function modifyData() {
+		$this->data = 'modified';
+		return true;
+	}
+
 }
 
 class TransitionComponentAppModelController extends TransitionComponentTestController {
@@ -454,6 +460,16 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->assertEqual($c->redirectTo, '/next');
 		$_SERVER = $backup;
 
+	}
+
+    function testModifyDataByControllerValidation() {
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$s = $t->Session;
+
+		$t->validationMethod = array($c, 'modifyData');
+		$this->assertTrue($t->checkData());
+		$this->assertEqual($t->data($c->params['action']), 'modified');
 	}
 
 }
