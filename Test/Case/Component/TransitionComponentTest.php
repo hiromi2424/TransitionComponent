@@ -1,12 +1,14 @@
 <?php
 
-App::import('Controller', array('Component', 'Controller'), false);
-App::import('Component', 'Transition.Transition');
+App::uses('Controller', 'Controller');
+App::uses('Component', 'Controller');
+App::uses('TransitionComponent', 'Transition.Controller/Component');
+App::uses('Router', 'Routing');
 
 class TransitionComponentTestController extends Controller {
 
 	public $name = 'TransitionComponentTest';
-	public $components = array('Transition');
+	public $components = array('Transition.Transition');
 	public $uses = array('TransitionModel');
 
 	public $redirectTo = null;

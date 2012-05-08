@@ -7,7 +7,7 @@
  * @copyright     Copyright 2010, hiromi
  * @package       cake
  * @subpackage    cake.app.controllers.components.transition
- * @version       2.0 Beta
+ * @version       2.0 RC1
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
