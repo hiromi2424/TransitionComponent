@@ -1,5 +1,7 @@
 # Transition Component #
 
+[![Build Status](https://travis-ci.org/hiromi2424/TransitionComponent.png?branch=cake2)](https://travis-ci.org/hiromi2424/TransitionComponent)
+
 ## Version ##
 
 This was versioned as 2.0 RC1.
