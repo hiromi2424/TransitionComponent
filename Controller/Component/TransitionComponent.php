@@ -126,6 +126,13 @@ class TransitionComponent extends Component {
 	public $controllerInflection = 'underscore';
 
 /**
+ * Whether request data is saved or not into session when the data was invalid.
+ * By default this component saves any request data even if invalidated for compatibilityi.
+ * @var boolean save or not
+ */
+	public $saveDataWhenInvalid = true;
+
+/**
  * Constructor
  *
  * @param ComponentCollection $collection instance for the ComponentCollection
@@ -339,9 +346,6 @@ class TransitionComponent extends Component {
 		$models = $this->autoLoadModels($models);
 
 		if ($this->Controller->request->is('post') || $this->Controller->request->is('put')) {
-
-			$this->setData($sessionKey, (array)$this->Controller->request->data);
-
 			if (is_array($models)) {
 				$result = true;
 				foreach ($models as $model) {
@@ -351,6 +355,10 @@ class TransitionComponent extends Component {
 				}
 			} else {
 				$result = $this->validateModel($models, $validationMethod);
+			}
+
+			if ($this->saveDataWhenInvalid || $result) {
+				$this->setData($sessionKey, (array)$this->Controller->request->data);
 			}
 
 			if ($result) {

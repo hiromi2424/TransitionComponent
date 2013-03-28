@@ -4,7 +4,7 @@
 
 ## Version ##
 
-This was versioned as 2.0 RC1.
+This was versioned as 2.0.
 
 ## Introduction ##
 
@@ -36,13 +36,18 @@ Or:
 	cd /path/to/your_repository
 	git submodule add git://github.com/hiromi2424/TransitionComponent.git plugins/Transition
 
+## Notice ##
+This component will store any request data into session by default.
+It means you will have to revalidate all of(or merged)data when saving into your database.
+However, you can also use "saveDataWhenInvalid" option to not store data when validation was failed.
+
 ## Summary ##
 
 - checkData() is to check data(if given) with model validation and auto redirecting
 - checkPrev() is to check previous page's session data exists.
 - automate() is convenient method for checkData() and checkPrev().
 
-## Sample ##
+## Examples ##
 
 1. Simple Wizard Form
 

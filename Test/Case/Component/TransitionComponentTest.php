@@ -521,4 +521,23 @@ class TransitionComponentTest extends CakeTestCase {
 		$this->assertNotEqual(array('mobile_index'), array_keys($check['transition_component_test']));
 	}
 
+	public function testSaveDataWhenInvalid() {
+		$c = $this->Controller;
+		$t = $c->Transition;
+		$s = $t->Session;
+
+		$t->saveDataWhenInvalid = false;
+		$c->request->data('Test.data', 1);
+		$result = $t->checkData('next', array('validationMethod' => 'validationFail'));
+		$this->assertFalse($result);
+		$result = $t->data($c->request->action);
+		$this->assertNull($result);
+
+		$t->saveDataWhenInvalid = true;
+		$result = $t->checkData('next', array('validationMethod' => 'validationFail'));
+		$this->assertFalse($result);
+		$result = $t->data($c->request->action);
+		$this->assertSame(array('Test' => array('data' => 1)), $result);
+	}
+
 }
