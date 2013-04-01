@@ -2,6 +2,7 @@ language: php
 
 php:
   - 5.3
+  - 5.4
 
 env:
   - DB=mysql CAKEPHP=2.2.7
