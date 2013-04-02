@@ -48,4 +48,4 @@ before_script:
   - cd ./cakephp
 
 script:
-  - ./lib/Cake/Console/cake test Transition Component/TransitionComponent --stderr
+  - ./lib/Cake/Console/cake test Transition Controller/Component/TransitionComponent --stderr
