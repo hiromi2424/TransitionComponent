@@ -13,7 +13,7 @@ class TransitionComponentTestController extends Controller {
 
 	public $redirectTo = null;
 
-	public function redirect($url) {
+	public function redirect($url, $status = null, $exit = true) {
 		$this->redirectTo = Router::url($url);
 		return true;
 	}
@@ -31,7 +31,7 @@ class TransitionModelBase extends CakeTestModel {
 	public $useTable = false;
 	public $validationSuccess = true;
 
-	public function validates() {
+	public function validates($options = array()) {
 		return $this->validationSuccess;
 	}
 

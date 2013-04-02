@@ -118,7 +118,7 @@ class TransitionComponent extends Component {
 	public $sessionBaseKey = 'Transition';
 
 /**
- * Inflection method for controller name. 
+ * Inflection method for controller name.
  * if controller name was detected from current controller, this method was applied to controller name.
  *
  * @var string method name for Inflector
@@ -161,7 +161,7 @@ class TransitionComponent extends Component {
  * @param object $Controller Instantiating controller
  * @return void
  */
-	public function startup($Controller) {
+	public function startup(Controller $Controller) {
 		if ($this->automation !== false) {
 			$doAutomate =
 				is_array($this->automation) &&
@@ -259,7 +259,7 @@ class TransitionComponent extends Component {
  * Check previous session data.
  *
  * @param mixed $prev Previous action for check
- * @param array $options 
+ * @param array $options
  * @param string $prevAction Previous action to Redirect.
  * @return boolean Success
  */
