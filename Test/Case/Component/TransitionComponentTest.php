@@ -483,10 +483,10 @@ class TransitionComponentTest extends CakeTestCase {
 
 		$expected = array('testdata' => 'hoge', 'User' => array('id' => 2, 'name' => 'user2', 'age' => 46));
 		$this->assertEqual($t->mergedData(), $expected);
-		$this->assertEqual($t->mergedData(array('Set', 'merge')), $expected);
+		$this->assertEqual($t->mergedData(array('Hash', 'merge')), $expected);
 		$expected = array('testdata' => 'hoge', 'User' => array('id' => 1, 'name' => 'user1', 'age' => 46));
-		$this->assertEqual($t->mergedData('Set::pushDiff'), $expected);
-		$this->assertEqual($t->mergedData(array('Set', 'pushDiff')), $expected);
+		$this->assertEqual($t->mergedData('Hash::mergeDiff'), $expected);
+		$this->assertEqual($t->mergedData(array('Hash', 'mergeDiff')), $expected);
 		$expected = array('testdata' => 'hoge', 'User' => array('id' => array(1, 2), 'name' => array('user1', 'user2'), 'age' => 46));
 		$this->assertEqual($t->mergedData('array_merge_recursive'), $expected);
 
