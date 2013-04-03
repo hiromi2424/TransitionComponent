@@ -36,7 +36,6 @@ before_script:
       'encoding' => 'utf8'
     );
     }" > ./app/Config/database.php
-  - cd ./cakephp
 
 script:
   - ./lib/Cake/Console/cake test Transition Controller/Component/TransitionComponent --stderr
