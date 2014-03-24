@@ -1,0 +1,21 @@
+{
+    "name": "hiromi2424/transition",
+    "description": "Transition component is a CakePHP component to help your transitional pages logic.",
+    "type": "cakephp-plugin",
+    "keywords": ["cakephp"],
+    "homepage": "https://github.com/hiromi2424/TransitionComponent",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hiroki Shimizu",
+            "homepage": "https://github.com/hiromi2424",
+            "role": "Author"
+        }
+    ],
+    "require": {
+        "composer/installers": "*"
+    },
+    "extra": {
+        "installer-name": "Transition"
+    }
+}
